@@ -1,0 +1,11 @@
+.header {
+    font-size: 16px;
+}
+.logo{
+    width: 150px;
+    height: 51px;
+    background:url('../assets/kouton.png') no-repeat center;
+    border-radius: 6px;
+    margin: 5px 20px 5px 20px;
+    float: left;
+}

@@ -1,0 +1,3610 @@
+/***********************************************************************************************************************
+less在线编译: http://tool.oschina.net/less
+
+flex 布局兼容性写法。参考 http://www.cnblogs.com/mk2016/p/5562994.html, https://segmentfault.com/a/1190000003978624
+09版参考：http://www.07net01.com/2015/12/1014839.html
+12版参考：http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html
+
+这里总结一下：
+1.Chrome、Chrome for android、iOS Safari、Firefox、Opera Mini、Android Browser、Opera、Safari这些主流浏览器都支持得很好。
+2.IE和UC for android这两个主流浏览器部分支持。
+详细说明：
+1.Android Browser 4.2-4.3版本部分支持
+    （下面代码中标记“09版”的，主要是为了兼容android 4.2-4.3版本）
+    1）Android4.1/4.2-4.3部分支持2009 ，需要-webkit-前缀
+    2）android4.1/4.2-4.3不支持wrapping
+2.Chrome和Safari，flex容器下的flex元素，设置高度为n%时不起作用，所以百分比高度不要用。
+3.Safari min-width, min-height 下计算flex item的问题: http://caniuse.com/#feat=flexbox
+4.IE10, IE11 min-height下flex-direction: column的问题: http://caniuse.com/#feat=flexbox
+5.IE11，使用min-height后不支持vertically align items
+6.IE10，wrap不工作，除非设置child elements为inline-block
+7.关于水平对齐
+    09版语法有4个参数：
+        box-pack: start | end | center | justify;
+        主轴对齐：左对齐（默认） | 右对齐 | 居中对齐 | 左右对齐
+    12新版语法有5个参数：
+        justify-content: flex-start | flex-end | center | space-between | space-around;
+        主轴对齐方式：左对齐（默认） | 右对齐 | 居中对齐 | 两端对齐 | 平均分布
+    兼容写法新版语法的 space-around 是不可用的
+8.关于垂直对齐
+    参数除了写法不同，其实是功能是一样的。
+    09版：
+        box-align: start | end | center | baseline | stretch;
+        交叉轴对齐：顶部对齐（默认） | 底部对齐 | 居中对齐 | 文本基线对齐 | 上下对齐并铺满(如果项目未设置高度或设为auto，将占满整个容器的高度)
+    12版：
+        align-items: flex-start | flex-end | center | baseline | stretch;
+        交叉轴对齐方式：顶部对齐（默认） | 底部对齐 | 居中对齐 | 文本基线对齐 | 上下对齐并铺满(如果项目未设置高度或设为auto，将占满整个容器的高度)
+***********************************************************************************************************************/
+/*12版 flex容器 - 元素排列方向*/
+/*flex容器 - 元素排列方向（默认是水平方向，从左到右）*/
+/*12版 flex容器 - 水平方向元素对齐方式*/
+/*12版 flex容器 - 垂直方向元素对齐方式*/
+/*flex容器 - 元素对齐方式（默认是水平方向居中，垂直方向占满容器高度，参考文件头详细说明第7,8点）*/
+/* flex容器 */
+/* 内联flex容器 */
+/* flex元素  - 0表示不允许缩放，>0表示缩放占比*/
+/***********************************************************************************************************************
+使用举例
+说明:
+1. box_开头是表示适用于容器，flexitem系列则适用于元素
+2. 适用于容器的类名分成4部分，每部分用_分隔，除box头外，其余3部分的意义表示元素排列方向、水平对齐、垂直对齐
+3. 当元素排列方向为水平方向时（不管正向或反向），3部分表示意义依次为
+    --------------------------------------
+    | 元素排列方向 | 水平对齐 | 垂直对齐 |
+    --------------------------------------
+4. 当元素排列方向为垂直方向时（不管正向或反向），3部分表示意义依次为
+    --------------------------------------
+    | 元素排列方向 | 垂直对齐 | 水平对齐 |
+    --------------------------------------
+    可以看出，水平方向和垂直方向，后两部分意义刚好相调。
+    但是，需要注意的是，stretch、justify和space-between还是要写到原来对应的参数位置。
+
+/**********************************************************************************************************************/
+.box_hn_left_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_hn_cen_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_hn_right_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_hn_justify_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_hn_left_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_hn_cen_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_hn_right_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_hn_justify_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_hn_left_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_hn_cen_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_hn_right_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_hn_justify_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_hn_left_stretch {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_hn_cen_stretch {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_hn_right_stretch {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_hn_justify_stretch {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: row;
+    -moz-flex-direction: row;
+    -ms-flex-direction: row;
+    -o-flex-direction: row;
+    flex-direction: row;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_hr_left_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_hr_cen_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_hr_right_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_hr_justify_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_hr_left_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_hr_cen_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_hr_right_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_hr_justify_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_hr_left_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_hr_cen_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_hr_right_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_hr_justify_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_hr_left_stretch {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_hr_cen_stretch {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_hr_right_stretch {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_hr_justify_stretch {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: row-reverse;
+    -moz-flex-direction: row-reverse;
+    -ms-flex-direction: row-reverse;
+    -o-flex-direction: row-reverse;
+    flex-direction: row-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_vn_left_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_vn_left_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_vn_left_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_vn_left_justify {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_vn_cen_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_vn_cen_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_vn_cen_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_vn_cen_justify {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_vn_right_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_vn_right_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_vn_right_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_vn_right_justify {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_vn_stretch_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_vn_stretch_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_vn_stretch_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_vn_stretch_justify {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    /* 12版 */
+
+    -webkit-flex-direction: column;
+    -moz-flex-direction: column;
+    -ms-flex-direction: column;
+    -o-flex-direction: column;
+    flex-direction: column;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_vr_left_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_vr_left_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_vr_left_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_vr_left_justify {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: start;
+    /* 09版 */
+
+    -webkit-align-items: flex-start;
+    -moz-align-items: flex-start;
+    -ms-align-items: flex-start;
+    -o-align-items: flex-start;
+    align-items: flex-start;
+    /* 12版 */
+
+}
+.box_vr_cen_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_vr_cen_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_vr_cen_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_vr_cen_justify {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: center;
+    /* 09版 */
+
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    /* 12版 */
+
+}
+.box_vr_right_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_vr_right_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_vr_right_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_vr_right_justify {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: end;
+    /* 09版 */
+
+    -webkit-align-items: flex-end;
+    -moz-align-items: flex-end;
+    -ms-align-items: flex-end;
+    -o-align-items: flex-end;
+    align-items: flex-end;
+    /* 12版 */
+
+}
+.box_vr_stretch_top {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: start;
+    /* 09版 */
+
+    -webkit-justify-content: flex-start;
+    -moz-justify-content: flex-start;
+    -ms-justify-content: flex-start;
+    -o-justify-content: flex-start;
+    justify-content: flex-start;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_vr_stretch_cen {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: center;
+    /* 09版 */
+
+    -webkit-justify-content: center;
+    -moz-justify-content: center;
+    -ms-justify-content: center;
+    -o-justify-content: center;
+    justify-content: center;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_vr_stretch_btm {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: end;
+    /* 09版 */
+
+    -webkit-justify-content: flex-end;
+    -moz-justify-content: flex-end;
+    -ms-justify-content: flex-end;
+    -o-justify-content: flex-end;
+    justify-content: flex-end;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+.box_vr_stretch_justify {
+    display: box;
+    /* OLD - Android 4.4- */
+
+    display: -webkit-box;
+    /* OLD - iOS 6-, Safari 3.1-6 */
+
+    display: -moz-box;
+    /* OLD - Firefox 19- (buggy but mostly works) */
+
+    display: -ms-flexbox;
+    /* TWEENER - IE 10 */
+
+    display: -webkit-flex;
+    /* NEW - Chrome */
+
+    display: flex;
+    /* NEW, Spec - Opera 12.1, Firefox 20+ */
+
+    /* 09版 */
+
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
+    /* 12版 */
+
+    -webkit-flex-direction: column-reverse;
+    -moz-flex-direction: column-reverse;
+    -ms-flex-direction: column-reverse;
+    -o-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    /* 水平方向 */
+
+    -webkit-box-align: justify;
+    /* 09版 */
+
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    /* 12版 */
+
+    /* 垂直方向 */
+
+    -webkit-box-pack: stretch;
+    /* 09版 */
+
+    -webkit-align-items: stretch;
+    -moz-align-items: stretch;
+    -ms-align-items: stretch;
+    -o-align-items: stretch;
+    align-items: stretch;
+    /* 12版 */
+
+}
+/*
+适用：元素
+缩放: 不缩放 (这是默认情况)
+*/
+.flexitem0 {
+    /* 09版 */
+
+    -webkit-box-flex: 0;
+    /* 12版 */
+
+    -moz-flex: 0 0 auto;
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+}
+/*
+适用：元素
+缩放: 正常缩放
+*/
+.flexitem1 {
+    /* 09版 */
+
+    -webkit-box-flex: 1;
+    /* 12版 */
+
+    -moz-flex: 1 1 auto;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
