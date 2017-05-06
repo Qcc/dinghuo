@@ -40,7 +40,8 @@ class DynamicMenu extends React.Component {
          }
      }
     menuUpdata=(data)=>{
-        if(data){    
+       console.dir("获取到的菜单  ",data)
+       /* if(data){    
             var firstItem;
             recursive(resp.entity);
          var groups = that.state.defaultOpenKeys;
@@ -69,7 +70,7 @@ class DynamicMenu extends React.Component {
                 that.props.PubSub.publish(that.props.Topics.Loading, false);
         });
     }
-        }
+        }*/
     }
 
     componentDidMount() {
