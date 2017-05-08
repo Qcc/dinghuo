@@ -1,9 +1,9 @@
 import React from 'react';
 import { Menu, Icon, Modal } from 'antd';
-import {fetch,dynamicMenuApi} from './utils/ajax';
+import {fetch,dynamicMenuApi} from '../utils/connect';
+import Loading from './Loading';
 const { SubMenu } = Menu;
-
-import reqwest from 'reqwest';
+ 
 
 class DynamicMenu extends React.Component {
 
@@ -39,42 +39,29 @@ class DynamicMenu extends React.Component {
              }
          }
      }
+     //回调，将动态菜单映射到state
     menuUpdata=(data)=>{
-       console.dir("获取到的菜单  ",data)
-       /* if(data){    
-            var firstItem;
-            recursive(resp.entity);
-         var groups = that.state.defaultOpenKeys;
-         var keys = that.state.defaultSelectedKeys;
-         var initial = false;
-         if(keys.length < 1) {
-             //首次取得菜单的情况
-             initial = true;
-             keys.push(firstItem.name);
-             groups.push(firstItem.parent.name);
-        
-         that.setState({loading: false, menuItems: resp.entity,
-             defaultSelectedKeys:keys,
-             defaultOpenKeys:groups
+        if(!data){
+            return;
+        }    
+        this.props.PubSub.publish(this.props.Topics.Loading, false);
+         var groups = this.state.defaultOpenKeys;
+         var keys = this.state.defaultSelectedKeys;
+         if(data.entity.length > 0) {
+             //默认页面 
+             keys.push(data.entity[0].children[0].name);
+             groups.push(data.entity[0].name);
          }
-         if(initial == true)
-             that.triggerMenuEvent(firstItem.name);
-     }
-     else {
-         Modal.error({
-             title: '异常2',
-             content: '访问菜单失败，请刷新页面重试'
-         });
-     }
-            }
-                that.props.PubSub.publish(that.props.Topics.Loading, false);
-        });
+        this.props.PubSub.publish(this.props.Topics.OnMenu, {menuKey:keys, menuItems:this.state.menuItems});
+         this.setState({
+                loading: false, 
+                menuItems: data.entity,
+            });
     }
-        }*/
-    }
-
+  
+  //获取动态菜单
     componentDidMount() {
-        fetch(dynamicMenuApi,);
+        fetch(dynamicMenuApi,this.menuUpdata);
     }
 
     triggerMenuEvent(key) {

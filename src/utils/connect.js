@@ -9,8 +9,7 @@ ajax请求函数
 @method 请求方法，默认GET
 @params 请求参数对象
 */
-export function fetch(url,onComplete,params = {},method='POST'){
-    url=ROOTURL+url;
+export function fetch(url,onComplete,params = {},method='GET'){
     console.log("调用了fecth =",'url',url,'method',method,'params:', params);
     reqwest({
       url: url,
@@ -31,7 +30,7 @@ export function fetch(url,onComplete,params = {},method='POST'){
         if(typeof onComplete == 'function'){
             onComplete(data);
         }else{
-            console.log("对调函数不正确",onComplete);
+            console.log("成功获取到数据,回调函数不正确",onComplete);
         }
         })
     .fail((err,msg)=>{
@@ -39,11 +38,20 @@ export function fetch(url,onComplete,params = {},method='POST'){
         if(typeof onComplete == 'function'){
             onComplete(null);
         }else{
-            console.log("对调函数不正确",onComplete);
+            console.log("获取数据失败,回调函数不正确",onComplete);
         }
     });
 };
 
 //退出
-export const logoutApi ='public/user/logout.api';
-export const dynamicMenuApi ='protected/dynamicmenu/get.api';
+export const logoutApi =ROOTURL +' /public/user/logout.api';
+//export const dynamicMenuApi = ROOTURL + '/protected/dynamicmenu/get.api';
+//订单 曾 删 改 查
+export const orderCreate = ROOTURL + "/protected/order/create.api";
+export const orderUpdate = ROOTURL + "/protected/order/update.api";
+export const orderDelete = ROOTURL + "/protected/order/delete.api";
+export const orderGetPager = ROOTURL + "/protected/order/getPager.api";
+
+
+
+export const dynamicMenuApi ="http://192.168.200.100:3000/menu";

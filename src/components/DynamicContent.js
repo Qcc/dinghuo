@@ -1,8 +1,9 @@
 import React from 'react';
 import { Table,Calendar } from 'antd';
-
-import OrderTable from '../components/OrderTable.js';
-import PartnerCURDTable from '../components/PartnerCURDTable.js';
+import AddPartner from './content/AddPartner'
+import AccountInfo from './content/AccountInfo'
+import OrderTable from './content/OrderTable.js';
+import PartnerCURDTable from './content/PartnerCURDTable.js';
 
 class DynamicContent extends React.Component {
     constructor(props) { super(props); }
@@ -36,14 +37,18 @@ class DynamicContent extends React.Component {
             PubSub: this.props.PubSub,
             ServerRootURL: this.props.ServerRootURL
         };
-
+        console.log("this.state.menuKey ",this.state.menuKey);
         if(this.state.menuKey == 'OrderList') {
             return <OrderTable {...commonProps} />;
-        }
-        else if(this.state.menuKey == 'AddPartner')
+        }else if(this.state.menuKey == 'AddPartner')
+            return <AddPartner />;
+        else if(this.state.menuKey == 'usergroup-add'){
             return <PartnerCURDTable />;
-        else
+        }else if(this.state.menuKey == 'AccountInfo'){
+            return <AccountInfo/>;            
+        }else{
             return <h1>{this.state.menuKey}</h1>;
+        }
     }
 
     render() {

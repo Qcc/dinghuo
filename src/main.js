@@ -7,7 +7,7 @@ import DynamicMenu from './components/DynamicMenu.js';
 import DynamicContent from './components/DynamicContent.js';
 import DynamicBreadcrumb from './components/DynamicBreadcrumb.js';
 import KtFooter from './components/Footer.js';
-import {fetch,logoutApi} from './utils/ajax';
+import {fetch,logoutApi} from './utils/connect';
 import styles from "./styles/main.css";
 
 const { Header, Content, Footer, Sider } = Layout;

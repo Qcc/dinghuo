@@ -1,8 +1,8 @@
 import React from 'react';
 import { Table } from 'antd';
-import ajax from '../utils/ajax.js';
+import ajax from '../../utils/connect';
 
-class OrderTable extends React.Component {
+class PartnerCURDTable extends React.Component {
     constructor(props) { super(props); }
 
     state = {
@@ -13,11 +13,6 @@ class OrderTable extends React.Component {
             pageSize: 1        //每页条数
         },
         loading: false
-    };
-
-    static propTypes = {
-        Topics: React.PropTypes.object.isRequired,
-        PubSub: React.PropTypes.object.isRequired
     };
 
     handleTableChange = (pagination, filters, sorter) => { //当点击页面下标时，这里传入的pagination.current指向了新页面
@@ -31,7 +26,7 @@ class OrderTable extends React.Component {
 
     fetch = () => {
         this.setState({ loading: true });
-        let url = this.props.ServerRootURL + "protected/order/getOrderCountAndPager.api";
+        let url = window.singleton.config.ServerRootURL + "protected/partner/getCountAndPager.api";
         ajax(url, {pageNO: this.state.pagination.current, size: this.state.pagination.pageSize}, null, (error, resp)=> {
             const pagination = { ...this.state.pagination };
             let data = [];
@@ -56,8 +51,14 @@ class OrderTable extends React.Component {
             title: '编号',
             dataIndex: 'id'
         }, {
-            title: '创建时间',
-            dataIndex: 'createDatetime'
+            title: '名称',
+            dataIndex: 'name'
+        }, {
+            title: '地址',
+            dataIndex: 'address'
+        }, {
+            title: '电话',
+            dataIndex: 'phone'
         }];
 
         return <Table bordered columns={columns}
@@ -71,4 +72,4 @@ class OrderTable extends React.Component {
 }
 
 //导出组件
-export default OrderTable;
+export default PartnerCURDTable;

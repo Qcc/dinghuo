@@ -1,0 +1,92 @@
+.usermod-title{
+    position: relative;
+    border-bottom: 1px solid #ccc;
+    height: 32px;
+}
+.usermod-title h2{
+    display: inline-block;
+}
+.usermod-edit-button{
+    position: absolute;
+    right: 10px;
+    bottom: 5px;
+}
+.usermod-avatar{
+    position: relative;
+    display: inline-block;
+    width: 150px;
+    height: 150px;
+    margin: 10px;
+}
+.usermod-avatar img{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -40px;
+    margin-top: -40px;
+    
+}
+.usermod-info{
+    display: inline-block;
+}
+.usermod-safe-container{
+    position: relative;
+    margin: 40px 0;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+.usermod-safe-icon{
+    margin-right: 20px;
+    font-size: 36px;
+    display: inline-block;
+}
+.usermod-safe-title{
+    display: inline-block;
+}
+.usermod-safe-title p{
+    color: #888;
+}
+.usermod-safe-container button{
+    position: absolute;
+    right: 10px;
+}
+.usermod-info{
+    font-size: 16px;
+}
+.usermod-info div{
+    margin: 30px 0;
+}
+.usermod-info-title{
+    color: #bbb;
+}
+.mod-pwd-next-button{
+    margin-left: -50%;
+}
+
+/* 修改密码密码框*/
+.anticon-close-circle {
+  cursor: pointer;
+  color: #ccc;
+  transition: color 0.3s;
+  font-size: 12px;
+}
+.anticon-close-circle:hover {
+  color: #999;
+}
+.anticon-close-circle:active {
+  color: #666;
+}
+
+/* 修改密码步骤条*/
+.steps-content {
+  margin-top: 16px;
+  border: 1px dashed #e9e9e9;
+  border-radius: 6px;
+  background-color: #fafafa;
+  /*min-height: 200px;*/
+  /*text-align: center;*/
+  /*padding-top: 10px;*/
+}
+.steps-action {
+  margin-top: 24px;
+}
