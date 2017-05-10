@@ -16,5 +16,8 @@
         "transform-runtime"
       ]
     }
+  },
+  "theme": {
+    "font-size-base": "13px"
   }
 }

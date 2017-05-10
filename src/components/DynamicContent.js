@@ -2,7 +2,7 @@ import React from 'react';
 import { Table,Calendar,Button } from 'antd';
 import AddPartner from './content/AddPartner'
 import AccountInfo from './content/AccountInfo'
-import CURDTable from './content/CURDTable.js';
+import PartnerManagerTable from './content/PartnerManagerTable.js';
 import PartnerCURDTable from './content/PartnerCURDTable.js';
 import {orderCreate,orderUpdate,orderDelete,orderGetPager,
         partnerCreate,partnerUpdate,partnerDelete,partnerGetPager,} from '../utils/connect';
@@ -77,46 +77,7 @@ class DynamicContent extends React.Component {
                   );
               }, 
         }];
-        //伙伴表 字段
-        this.PartnerColumns = [{
-          title: 'ID',
-          dataIndex: 'id',
-        }, {
-          title: '公司名称',
-          dataIndex: 'partner',
-        },{
-          title: '联系人',
-          dataIndex: 'product',
-        },  {
-          title: '电话',
-          dataIndex: 'createDatetime',
-        }, {
-          title: '邮箱',
-          dataIndex: 'amount',
-        }, {
-          title: '库存',
-          dataIndex: 'price',
-        }, {
-          title: '销售代表',
-          dataIndex: 'user',
-        }, {
-          title: '审核时间',
-          dataIndex: 'approvalDatetime',
-        },{
-          title: '状态',
-          dataIndex: 'state',
-        }, {
-          title: '操作',
-          dataIndex: 'edit',
-          render: (text, record, index) => {
-                  return (
-                    <div>
-                        <a onClick={()=>this.CURDTable.editRow(record)}>编辑</a>
-                        { " / " }<a onClick={()=>this.CURDTable.deleteRow(record)}>删除</a>
-                    </div> 
-                  );
-              }, 
-        }];
+        
     }
 
     state = {
@@ -145,49 +106,13 @@ class DynamicContent extends React.Component {
     }
 
     dynamicContent() {
-        let orderProps = {  //订单 表格 自定义 url 数据列
-            Create:orderCreate,
-            Update:orderUpdate,
-            Delete:orderDelete,
-            GetPager:orderGetPager,
-            title:"订单管理",    //页面 content title
-            newModalTitle:"新建订单", //模态框title
-            newButton:"新建订单",  // 新建按钮 name
-            editModalTitle:"编辑订单",
-            deleteModalTitle:"删除订单",
-            Columns:this.OrderColumns, //表格列
-        };
-        let partnerProps = {  //订单 表格 自定义 url 数据列
-            Create:partnerCreate,
-            Update:partnerUpdate,
-            Delete:partnerDelete,
-            GetPager:partnerGetPager,
-            title:"伙伴管理",    //页面 content title
-            newModalTitle:"新建伙伴", //模态框title
-            newButton:"新建伙伴",  // 新建按钮 name
-            editModalTitle:"编辑伙伴",
-            deleteModalTitle:"删除伙伴",
-            Columns:this.PartnerColumns, //表格列
-        };
-        let employeeProps = {  //订单 表格 自定义 url 数据列
-            Create:orderCreate,
-            Update:orderUpdate,
-            Delete:orderDelete,
-            GetPager:orderGetPager,
-            title:"员工管理",    //页面 content title
-            newModalTitle:"新建员工", //模态框title
-            newButton:"新建员工",  // 新建按钮 name
-            editModalTitle:"编辑员工",
-            deleteModalTitle:"删除员工",
-            Columns:this.OrderColumns, //表格列
-        };
-        console.log("this.state.menuKey ",this.state.menuKey);
+        console.log("当前菜单 ",this.state.menuKey);
         if(this.state.menuKey == 'OrderList') {
-            return <CURDTable {...orderProps} ref={(node)=>this.CURDTable=node}/>;
-        }else if(this.state.menuKey == 'ModPartner')
-            return <CURDTable {...partnerProps} ref={(node)=>this.CURDTable=node}/>;
+            return <PartnerManagerTable  />;
+        }else if(this.state.menuKey == 'PartnerManager')
+            return <PartnerManagerTable />;
         else if(this.state.menuKey == 'ModEmployee'){
-            return <CURDTable {...employeeProps} ref={(node)=>this.CURDTable=node}/>;
+            return <PartnerManagerTable  />;
         }else if(this.state.menuKey == 'AccountInfo'){
             return <AccountInfo/>;            
         }else{
