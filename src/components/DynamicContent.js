@@ -2,8 +2,8 @@ import React from 'react';
 import { Table,Calendar,Button } from 'antd';
 import AddPartner from './content/AddPartner'
 import AccountInfo from './content/AccountInfo'
-import PartnerManagerTable from './content/PartnerManagerTable.js';
-import PartnerCURDTable from './content/PartnerCURDTable.js';
+import PartnerManager from './content/PartnerManager';
+import AgencyPriceManager from './content/AgencyPriceManager';
 import {orderCreate,orderUpdate,orderDelete,orderGetPager,
         partnerCreate,partnerUpdate,partnerDelete,partnerGetPager,} from '../utils/connect';
 
@@ -107,10 +107,10 @@ class DynamicContent extends React.Component {
 
     dynamicContent() {
         console.log("当前菜单 ",this.state.menuKey);
-        if(this.state.menuKey == 'OrderList') {
-            return <PartnerManagerTable  />;
-        }else if(this.state.menuKey == 'PartnerManager')
-            return <PartnerManagerTable />;
+        if(this.state.menuKey == 'PartnerManager') {
+            return <PartnerManager/>;
+        }else if(this.state.menuKey == 'AgencyPriceManager')
+            return <AgencyPriceManager />;
         else if(this.state.menuKey == 'ModEmployee'){
             return <PartnerManagerTable  />;
         }else if(this.state.menuKey == 'AccountInfo'){
