@@ -103,13 +103,13 @@ class AgencyPriceManager extends React.Component {
         for(let i=0;i<tempArray.length;i++){
             sourceData.push({ 
                 "serial":i+1,
-                "id":tempArray[i].partner.id,
-                "company":tempArray[i].partner.company,
-                "productName":tempArray[i].product.productName,
-                "productVersion":tempArray[i].product.productVersion,
-                "productId":tempArray[i].product.productId,                
+                "id":tempArray[i].partner && tempArray[i].partner.id,
+                "company":tempArray[i].partner && tempArray[i].partner.company,
+                "productName":tempArray[i].product && tempArray[i].product.productName,
+                "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
+                "productId":tempArray[i].product && tempArray[i].product.productId,                
                 "value":tempArray[i].value,               
-                "balance":tempArray[i].partner.balance,                
+                "balance":tempArray[i].partner && tempArray[i].partner.balance,                
                 "state":state(tempArray[i].state),
             });
         }
@@ -200,7 +200,7 @@ class AgencyPriceManager extends React.Component {
 
         return(<div>
                 <Table bordered columns={columns}
-                    rowKey={record => record.id}          //Table.rowKey：表格行 key 的取值，可以是字符串或一个函数 （我的理解：给每一行一个唯一标识）
+                    rowKey={record => record.serial}          //Table.rowKey：表格行 key 的取值，可以是字符串或一个函数 （我的理解：给每一行一个唯一标识）
                     dataSource={this.state.data}
                     pagination={this.state.pagination}  //Table.pagination：分页器，配置项参考 pagination，设为 false 时不展示和进行分页
                     loading={this.state.loading}        //Table.loading：页面是否加载中

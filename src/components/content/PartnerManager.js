@@ -303,7 +303,7 @@ class PartnerManager extends React.Component {
                 "level":tempArray[i].level,
                 "email":tempArray[i].email,
                 "phone":tempArray[i].phone,                
-                "user":tempArray[i].salesUser.name,
+                "user":tempArray[i].salesUser && tempArray[i].salesUser.name,
             });
         }
         this.setState({
@@ -462,7 +462,7 @@ class PartnerManager extends React.Component {
                 <Button type="primary" onClick={this.createNewItem} style={{position:"absolute",right:0}}>新建伙伴</Button>
                 </div>
             <Table bordered columns={Columns}
-                rowKey={record => record.id}          //Table.rowKey：表格行 key 的取值，可以是字符串或一个函数 （我的理解：给每一行一个唯一标识）
+                rowKey={record => record.serial}          //Table.rowKey：表格行 key 的取值，可以是字符串或一个函数 （我的理解：给每一行一个唯一标识）
                 dataSource={this.state.data}
                 pagination={this.state.pagination}  //Table.pagination：分页器，配置项参考 pagination，设为 false 时不展示和进行分页
                 loading={this.state.loading}        //Table.loading：页面是否加载中

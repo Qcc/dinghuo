@@ -39,7 +39,7 @@ class DynamicMenu extends React.Component {
              }
          }
      }
-     //回调，将动态菜单映射到state
+     //回调，将动态菜单映射到 state  
     menuUpdata=(data)=>{
         if(!data){
             return;
@@ -49,10 +49,10 @@ class DynamicMenu extends React.Component {
          var keys = this.state.defaultSelectedKeys;
          if(data.entity.length > 0) {
              //默认页面 
-             keys.push(data.entity[0].children[0].name);
-             groups.push(data.entity[0].name);
+             keys.push(data.entity[1].children[1].name);
+             groups.push(data.entity[1].name);
          }
-        this.props.PubSub.publish(this.props.Topics.OnMenu, {menuKey:keys, menuItems:this.state.menuItems});
+        this.props.PubSub.publish(this.props.Topics.OnMenu, {menuKey:keys[0], menuItems:this.state.menuItems});
          this.setState({
                 loading: false, 
                 menuItems: data.entity,

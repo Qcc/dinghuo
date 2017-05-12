@@ -13,6 +13,7 @@ export function fetch(url,onComplete,params = {},method='GET'){
     console.log("调用了fecth =",'url',url,'method',method,'params:', params);
     if(typeof onComplete !== 'function'){
         console.log("成功获取到数据,回调函数不正确",onComplete);
+        return;
     }
     reqwest({
       url: url,
@@ -47,17 +48,23 @@ export const logoutApi =ROOTURL +' /public/user/logout.api';
 export const orderCreate = ROOTURL + "/protected/order/create.api";
 export const orderUpdate = ROOTURL + "/protected/order/update.api";
 export const orderDelete = ROOTURL + "/protected/order/delete.api";
-//export const orderGetPager = ROOTURL + "/protected/order/getPager.api";
+export const orderGetPager = ROOTURL + "/protected/order/getPager.api";
+//发货
+export const orderfulfill = ROOTURL + "/protected/order/fulfill.api";
+
 
 //伙伴管理 曾 删 改 查
-//export const partnerCreate = ROOTURL + "/protected/partner/create.api";
+export const partnerCreate = ROOTURL + "/protected/partner/create.api";
 export const partnerUpdate = ROOTURL + "/protected/partner/update.api";
 export const partnerDelete = ROOTURL + "/protected/partner/delete.api";
-//export const partnerGetPager = ROOTURL + "/protected/partner/getPager.api";
+export const partnerGetPager = ROOTURL + "/protected/partner/getPager.api";
+
 //价格管理
-//export const priceGetPager = ROOTURL + "/protected/agencyprice/getPager.api";
+export const priceGetPager = ROOTURL + "/protected/agencyprice/getPager.api";
 export const priceApply = ROOTURL + "/protected/agencyprice/apply.api";
 
+//库存查询
+export const queryStockGetPager = ROOTURL + "/protected/stock/getPager.api";
 
 
 //================mock data=================
@@ -65,8 +72,14 @@ export const priceApply = ROOTURL + "/protected/agencyprice/apply.api";
 //export const dynamicMenuApi ="http://192.168.200.100:3000/caiwuMenu";
 //销售
 export const dynamicMenuApi ="http://192.168.200.100:3000/xiaoshouMenu";
-
+//
 //export const orderGetPager = "http://192.168.200.100:3000/orderGetPager";
-export const partnerGetPager = "http://192.168.200.100:3000/partnerManager";
-export const partnerCreate = "http://192.168.200.100:3000/partnerManager";
-export const priceGetPager = "http://192.168.200.100:3000/priceGetPager";
+//export const partnerGetPager = "http://192.168.200.100:3000/partnerManager";
+//export const partnerCreate = "http://192.168.200.100:3000/partnerManager";
+//export const priceGetPager = "http://192.168.200.100:3000/priceGetPager";
+//export const queryStockGetPager = "http://192.168.200.100:3000/StockManager";
+//export const orderCreate = "http://192.168.200.100:3000/StockManager";
+
+
+
+//export const TEST = "http://192.168.200.100:3000/priceGetPager";

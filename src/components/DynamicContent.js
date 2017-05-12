@@ -1,6 +1,9 @@
 import React from 'react';
 import { Table,Calendar,Button } from 'antd';
-import AddPartner from './content/AddPartner'
+import StockManager from './content/StockManager'
+import CreateOrder from './content/CreateOrder'
+import PendingOrdersSales from './content/PendingOrdersSales'
+import OrderDetails from './content/OrderDetails'
 import AccountInfo from './content/AccountInfo'
 import PartnerManager from './content/PartnerManager';
 import AgencyPriceManager from './content/AgencyPriceManager';
@@ -106,17 +109,26 @@ class DynamicContent extends React.Component {
     }
 
     dynamicContent() {
-        console.log("当前菜单 ",this.state.menuKey);
-        if(this.state.menuKey == 'PartnerManager') {
-            return <PartnerManager/>;
-        }else if(this.state.menuKey == 'AgencyPriceManager')
-            return <AgencyPriceManager />;
-        else if(this.state.menuKey == 'ModEmployee'){
-            return <PartnerManagerTable  />;
-        }else if(this.state.menuKey == 'AccountInfo'){
-            return <AccountInfo/>;            
-        }else{
-            return <h1>{this.state.menuKey}</h1>;
+        let menuItem =this.state.menuKey;
+
+        console.log("当前菜单 ",menuItem,"菜单类型 ",typeof this.state.menuKey);
+        switch(menuItem){
+            case 'PartnerManager' :
+                return  <PartnerManager/>;
+            case 'AgencyPriceManager':
+                return  <AgencyPriceManager />;
+            case 'StockQuery':
+                return <StockManager  />;
+            case 'CreateOrder':
+                return <CreateOrder />;
+            case 'PendingOrders_Sales':
+                return <PendingOrdersSales/>;
+            case 'OrderDetails':
+                return <OrderDetails/>;
+            case 'MyAccount':
+                return <AccountInfo/>;
+            default :
+                return <h1>{this.state.menuKey}</h1>;
         }
     }
     
