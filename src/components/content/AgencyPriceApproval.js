@@ -1,6 +1,6 @@
 import React from 'react';
-import { Table,Icon,Button,Modal,Form,Input,InputNumber,Tooltip} from 'antd';
-import {fetch,priceGetPager,priceApply} from '../../utils/connect';
+import { Table,Icon,Button,Modal,Form,Input,InputNumber,Tooltip,Radio } from 'antd';
+import {fetch,priceGetPager,priceApproval} from '../../utils/connect';
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
@@ -12,7 +12,8 @@ const formItemLayout = {
   },
 };
 const FormItem = Form.Item;
-class AgencyPriceManager extends React.Component {
+const RadioGroup = Radio.Group;
+class AgencyPriceApproval extends React.Component {
     constructor(props) { super(props); }
 
     state = {
@@ -28,6 +29,8 @@ class AgencyPriceManager extends React.Component {
         editPrice:{
                 visibleEdit:false, //编辑按钮  模态框 是否可见        
                 loadingEdit:false,     
+                validateStatus:'',
+                help:'',
                 data:{},//待编辑行对象                                                                   
             },
         loading: false
@@ -66,14 +69,6 @@ class AgencyPriceManager extends React.Component {
         });
     } 
 
-    resetValue=()=>{
-        let state = {...this.state.editPrice};
-            state.data.value=state.data.tempValue;
-        this.setState({
-            editPrice:state,
-        });
-    }
-
     //获取数据后映射到 table state
     priceUpdate = (data) => {
         if(!data){
@@ -101,7 +96,6 @@ class AgencyPriceManager extends React.Component {
         let tempArray = data.entity.list;
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
-            if(tempArray[i].state === 4) continue;
             sourceData.push({ 
                 "serial":i+1,
                 "id":tempArray[i].partner && tempArray[i].partner.id,
@@ -111,7 +105,8 @@ class AgencyPriceManager extends React.Component {
                 "productId":tempArray[i].product && tempArray[i].product.productId,                
                 "value":tempArray[i].value,               
                 "balance":tempArray[i].partner && tempArray[i].partner.balance,                
-                "state":state(tempArray[i].state),
+                "status":state(tempArray[i].state),
+                "state":tempArray[i].state,                
             });
         }
         this.setState({
@@ -133,12 +128,12 @@ class AgencyPriceManager extends React.Component {
         this.componentDidMount();
         Modal.success({
               title: '成功',
-              content: '申请代理价成功，等待财务审核。',
+              content: '价格审核成功。',
         });
     }else{
         Modal.error({
               title: '错误',
-              content: '服务器错误，申请代理价格失败，请稍后重试！',
+              content: '服务器错误，价格审核失败，请稍后重试！',
             });
     }
   }
@@ -146,23 +141,30 @@ class AgencyPriceManager extends React.Component {
   handleSubmit = (e) => {
     e.preventDefault();
     this.handlePriceCancel();
-    if (this.state.editPrice.data.value !== this.state.editPrice.data.tempValue) {        
-        fetch(priceApply,this.onComplate,{"product.productId":this.state.editPrice.data.productId,
-                    "partner.id":this.state.editPrice.data.id,
-                    "agencypriceValue":this.state.editPrice.data.value},"POST");
+    if(this.state.editPrice.data.pass === undefined){
+        let state = {...this.state.editPrice};
+            state.validateStatus = 'error';
+            state.help = '请选择是否通过该价格审核.';
+        this.setState({
+           editPrice:state,
+        });
+        return;
     }
-    console.log("value ",this.state.editPrice.data.value,"---","tempValue ",this.state.editPrice.data.tempValue);
+    fetch(priceApproval,this.onComplate,{"product.productId":this.state.editPrice.data.productId,
+        "partner.id":this.state.editPrice.data.id,
+        "agencypriceValue":this.state.editPrice.data.value,
+         "pass":this.state.editPrice.data.pass},"POST");
   }
- 
-  onPriceChange=(value)=>{
-      console.log(value);
+  
+  onStateChange=(e)=>{
      let state = {...this.state.editPrice}
-     state.data.value =  value;
+     state.data.pass =  e.target.value;
+     state.validateStatus = '';
+     state.help = '';
      this.setState({
         editPrice:state,
      });
-     console.log(this.state.editPrice);
-    }
+  }
     
     render() {
         //伙伴表 字段
@@ -179,21 +181,21 @@ class AgencyPriceManager extends React.Component {
           title: '产品版本',
           dataIndex: 'productVersion',
         }, {
-          title: '订货价格',
+          title: '申请价格',
           dataIndex: 'value',
         }, {
           title: '压款余额',
           dataIndex: 'balance',
         }, {
           title: '价格状态',
-          dataIndex: 'state',
+          dataIndex: 'status',
         },{
           title: '操作',
           dataIndex: 'edit',
           render: (text, record, index) => {
                   return (
                     <div>
-                        <a onClick={()=>this.editRow(record)}>{this.state.data.state?"修改代理价":"申请代理价"}</a>
+                         {record.state === 0?<a onClick={()=>this.editRow(record)}>审核</a>:''}
                     </div> 
                   );
               }, 
@@ -209,7 +211,7 @@ class AgencyPriceManager extends React.Component {
                 />
                 <Modal
                   visible={this.state.editPrice.visibleEdit}
-                  title="申请伙伴价格"
+                  title="审核伙伴订货价格"
                   onCancel={this.handlePriceCancel}
                   footer={null}
                 >
@@ -228,25 +230,31 @@ class AgencyPriceManager extends React.Component {
                   
                       <FormItem {...formItemLayout} label="设置价格" >
                               <InputNumber 
-                                min={0}
-                                max={10000}
+                                disabled
                                 style={{width:"150px"}}
                                 value={this.state.editPrice.data.value}
-                                formatter={value => `￥ ${value}`}
-                                parser={value => value.replace(/\￥\s?/g, '')}
-                                onChange={this.onPriceChange}
                               />
-                              <Tooltip title="此处为单价,请设置一个站点的价格。">
+                              <Tooltip title="此处为单价,请确认价格是否合适。">
                                 <Icon type="question-circle-o" />
                               </Tooltip>
                       </FormItem>
+                     
+                      <FormItem {...formItemLayout} 
+                          hasFeedback
+                          validateStatus={this.state.editPrice.validateStatus}
+                          help={this.state.editPrice.help} 
+                          label="审核价格" >
+                          <RadioGroup onChange={this.onStateChange} value={this.state.editPrice.data.pass}>
+                            <Radio value={1}>通过</Radio>
+                            <Radio value={0}>不通过</Radio>
+                          </RadioGroup>
+                      </FormItem>
+                     
                       <br />
                       <FormItem>
                       <div style={{textAlign:"center"}}>
                         <Button style={{width:"110px",marginRight:"10px"}} onClick={this.handlePriceCancel}>取消</Button>
-                        <Button type="dashed" style={{width:"110px",marginRight:"10px"}}
-                                onClick={this.resetValue}>重置</Button>
-                        <Button type="primary" htmlType="submit"  style={{width:"110px"}}>提交审核</Button>          
+                        <Button type="primary" htmlType="submit"  style={{width:"110px"}}>确认</Button>          
                       </div>  
                       </FormItem>
                   
@@ -257,4 +265,4 @@ class AgencyPriceManager extends React.Component {
 }               
 
 //导出组件              
-export               default AgencyPriceManager;
+export default AgencyPriceApproval;

@@ -2,7 +2,7 @@ import React from 'react';
 import { Table } from 'antd';
 import {fetch,orderGetPager} from '../../utils/connect';
 
-class OrderDetails extends React.Component{
+class HistoryOrders extends React.Component{
       constructor(props) { super(props); }
 
     state = {
@@ -123,13 +123,13 @@ class OrderDetails extends React.Component{
         }, {
           title: '状态',
           dataIndex: 'stateName',
-        },  {
+        },   {
           title: '银行流水号',
           dataIndex: 'transferNumber',
         },  {
           title: '订单备注',
           dataIndex: 'comment',
-        }, {
+        },{
           title: '销售',
           dataIndex: 'sales',
         } ];
@@ -141,8 +141,9 @@ class OrderDetails extends React.Component{
                 pagination={this.state.pagination}  //Table.pagination：分页器，配置项参考 pagination，设为 false 时不展示和进行分页
                 loading={this.state.loading}        //Table.loading：页面是否加载中
                 onChange={this.handleTableChange}  //Table.onChange：分页、排序、筛选变化时触发
-            />);
+            />
+            );
     }
 }
 
-export default OrderDetails;
+export default HistoryOrders;

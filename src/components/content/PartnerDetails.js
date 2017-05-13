@@ -1,14 +1,14 @@
 import React from 'react';
-import { Table } from 'antd';
-import {fetch,orderGetPager} from '../../utils/connect';
+import { Table} from 'antd';
+import {fetch,partnerGetPager} from '../../utils/connect';
 
-class OrderDetails extends React.Component{
-      constructor(props) { super(props); }
+
+class PartnerDetails extends React.Component {
+    constructor(props) { super(props); }
 
     state = {
         data: [],
         loading: false, //表格加载中
-        row:{}, // 保存要操作的行
         pagination: { //分页器
                 showSizeChanger:true, //是否可设置每页显示多少行
                 defaultCurrent:1, //默认页码
@@ -30,24 +30,7 @@ class OrderDetails extends React.Component{
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:pager.current,size:pager.pageSize,ifGetCount:1}
-        fetch(orderGetPager,this.callbackDate);
-    }
-
-    stateName=(state)=>{
-        let s='';
-        switch(state){
-            case -2:s='审核不通过';
-            break;
-            case 1:s='待审核';
-            break;
-            case 2:s='待付款';
-            break;
-            case 3:s='待发货';
-            break;
-            case 4:s='已完成';
-            break;
-        }
-        return s;
+        fetch(partnerGetPager,this.callbackDate);
     }
 
     //获取数据后映射到 table state
@@ -64,37 +47,40 @@ class OrderDetails extends React.Component{
         let tempArray = data.entity.list;
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
-            if(tempArray[i].state == 4){
-                sourceData.push({ 
-                    "serial":i+1,
-                    "id":tempArray[i].id,
-                    "company":tempArray[i].partner && tempArray[i].partner.company,
-                    "productName":tempArray[i].product && tempArray[i].product.productName,
-                    "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
-                    "points":tempArray[i].points,
-                    "sum":tempArray[i].sum,
-                    "state":tempArray[i].state,  
-                    "stateName":this.stateName(tempArray[i].state),                                              
-                    "sales":tempArray[i].user && tempArray[i].user.name,
-                    "transferNumber":tempArray[i].transferNumber,
-                    "comment":tempArray[i].comment,
-                });
-            }
+            sourceData.push({ 
+                "serial":i+1,
+                "id":tempArray[i].id,
+                "name":tempArray[i].name,
+                "address":tempArray[i].address,
+                "company":tempArray[i].company,
+                "level":tempArray[i].level,
+                "email":tempArray[i].email,
+                "phone":tempArray[i].phone,                
+                "user":tempArray[i].salesUser && tempArray[i].salesUser.name,
+            });
         }
         this.setState({
             loading:false,
             data:sourceData,
             pagination:pager,
-        },()=>{console.log("1111",this.state.data.state)});
-
+        });
     }
-     
+    // //切换模块时，重新获取数据
+    // componentWillReceiveProps=(nextProps)=>{
+    //     console.log("接受了新的props",nextProps);
+    //     this.setState({
+    //         loading:true,
+    //     });
+    //     // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
+    //     fetch(nextProps.GetPager,this.callbackDate);
+    // }
+    //首次加载组件 获取数据
     componentDidMount=()=>{
         this.setState({
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
-        fetch(orderGetPager,this.callbackDate);
+        fetch(partnerGetPager,this.callbackDate);
     }
 
     render() {
@@ -103,40 +89,28 @@ class OrderDetails extends React.Component{
           title: '序号',
           dataIndex: 'serial',
         }, {
-          title: '订单号',
-          dataIndex: "id",
-        },{
-          title: '代理商',
+          title: '公司名称',
           dataIndex: 'company',
+        },{
+          title: '联系人',
+          dataIndex: 'name',
         },  {
-          title: '产品名称',
-          dataIndex: 'productName',
+          title: '电话',
+          dataIndex: 'phone',
         }, {
-          title: '版本',
-          dataIndex: 'productVersion',
+          title: '邮箱',
+          dataIndex: 'email',
         }, {
-          title: '站点数',
-          dataIndex: 'points',
+          title: '代理商级别',
+          dataIndex: 'level',
         }, {
-          title: '金额',
-          dataIndex: 'sum',
-        }, {
-          title: '状态',
-          dataIndex: 'stateName',
-        },  {
-          title: '银行流水号',
-          dataIndex: 'transferNumber',
-        },  {
-          title: '订单备注',
-          dataIndex: 'comment',
-        }, {
-          title: '销售',
-          dataIndex: 'sales',
-        } ];
+          title: '销售代表',
+          dataIndex: 'user',
+        }];
 
         return (
             <Table bordered columns={Columns}
-                rowKey={record => record.id}          //Table.rowKey：表格行 key 的取值，可以是字符串或一个函数 （我的理解：给每一行一个唯一标识）
+                rowKey={record => record.serial}          //Table.rowKey：表格行 key 的取值，可以是字符串或一个函数 （我的理解：给每一行一个唯一标识）
                 dataSource={this.state.data}
                 pagination={this.state.pagination}  //Table.pagination：分页器，配置项参考 pagination，设为 false 时不展示和进行分页
                 loading={this.state.loading}        //Table.loading：页面是否加载中
@@ -145,4 +119,5 @@ class OrderDetails extends React.Component{
     }
 }
 
-export default OrderDetails;
+//导出组件
+export default PartnerDetails;

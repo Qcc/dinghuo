@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table,Icon,Button,Modal,Form,Input,Select } from 'antd';
-import {fetch,partnerCreate,partnerUpdate,partnerDelete,partnerGetPager} from '../../utils/connect';
+import {fetch,fetch2,partnerCreate,partnerUpdate,partnerDelete,partnerGetPager} from '../../utils/connect';
 
 const formItemLayout = {
   labelCol: {
@@ -17,9 +17,14 @@ const Option = Select.Option;
 
 
 class AddModalForm extends React.Component {
-
+  state={
+      loading:false,
+  }
     //添加成功数据后的回调
   onComplate=(data)=>{
+    this.setState({
+      loading:false,
+    });
     if(data){
         //表格重新加载数据
         this.props.handleAddCancel();
@@ -46,6 +51,9 @@ class AddModalForm extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+    this.setState({
+      loading:true,
+    });
     this.props.form.validateFields((err, values) => {
       if (!err) {
           fetch(partnerCreate,this.onComplate,values,"POST");
@@ -93,7 +101,7 @@ class AddModalForm extends React.Component {
         </FormItem>
 
         <FormItem {...formItemLayout} label="邮箱" >
-          {getFieldDecorator('enail', {
+          {getFieldDecorator('email', {
             rules: [{ required: true, message: '请输入代理商邮箱地址!' },
              {type:"email",message:"输入的邮箱不正确!"}],
           })(
@@ -114,7 +122,7 @@ class AddModalForm extends React.Component {
           <Button style={{width:"110px",marginRight:"10px"}} onClick={this.handleCancel}>取消</Button>
           <Button type="dashed" style={{width:"110px",marginRight:"10px"}}
                   onClick={()=>{this.props.form.resetFields()}}>重置</Button>
-          <Button type="primary" htmlType="submit"  style={{width:"110px"}}>确定</Button>                              
+          <Button type="primary" htmlType="submit" loading={this.state.loading}  style={{width:"110px"}}>确定</Button>                              
         </div>  
         </FormItem>
 
@@ -154,7 +162,11 @@ class EditModalForm extends React.Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-          fetch(partnerUpdate,this.onComplate,values,"POST");
+          let param = {
+            condition: {id:this.props.record.id},
+            entity: values
+          }
+          fetch2(partnerUpdate,this.onComplate,param,"POST");
       }
     });
   }
@@ -279,6 +291,19 @@ class PartnerManager extends React.Component {
         // 真实api加 参数查询分页 {pageNO:pager.current,size:pager.pageSize,ifGetCount:1}
         fetch(partnerGetPager,this.callbackDate);
     }
+    //处理伙伴等级
+    partnerLevel=(level)=>{
+      let s ='';
+      switch(level){
+        case "ordinary":s="普通代理";
+          break; 
+        case "gold": s="金牌代理";                      
+          break;
+        case "isv":s="ISV合作";
+          break;
+      }
+      return s;
+    }
 
     //获取数据后映射到 table state
     callbackDate = (data) => {
@@ -300,10 +325,11 @@ class PartnerManager extends React.Component {
                 "name":tempArray[i].name,
                 "address":tempArray[i].address,
                 "company":tempArray[i].company,
-                "level":tempArray[i].level,
+                "level":this.partnerLevel(tempArray[i].level),
                 "email":tempArray[i].email,
                 "phone":tempArray[i].phone,                
-                "user":tempArray[i].salesUser && tempArray[i].salesUser.name,
+                "user":tempArray[i].salesUser && tempArray[i].salesUser.employee &&
+                        tempArray[i].salesUser.employee.name,
             });
         }
         this.setState({

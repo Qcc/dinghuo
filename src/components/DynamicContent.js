@@ -1,14 +1,24 @@
 import React from 'react';
 import { Table,Calendar,Button } from 'antd';
+//销售模块
 import StockManager from './content/StockManager'
 import CreateOrder from './content/CreateOrder'
+import LicenseManager from './content/LicenseManager'
 import PendingOrdersSales from './content/PendingOrdersSales'
 import OrderDetails from './content/OrderDetails'
-import AccountInfo from './content/AccountInfo'
 import PartnerManager from './content/PartnerManager';
 import AgencyPriceManager from './content/AgencyPriceManager';
-import {orderCreate,orderUpdate,orderDelete,orderGetPager,
-        partnerCreate,partnerUpdate,partnerDelete,partnerGetPager,} from '../utils/connect';
+// import {orderCreate,orderUpdate,orderDelete,orderGetPager,
+//         partnerCreate,partnerUpdate,partnerDelete,partnerGetPager,} from '../utils/connect';
+//财务模块
+import PendingOrdersFinance from './content/PendingOrdersFinance'
+import HistoryOrders from './content/HistoryOrders'
+import AgencyPriceApproval from './content/AgencyPriceApproval'
+import PartnerDetails from './content/PartnerDetails'
+
+
+//账户信息
+import AccountInfo from './content/AccountInfo'
 
 
 //伙伴管理表格 字段
@@ -113,6 +123,7 @@ class DynamicContent extends React.Component {
 
         console.log("当前菜单 ",menuItem,"菜单类型 ",typeof this.state.menuKey);
         switch(menuItem){
+            //销售模块
             case 'PartnerManager' :
                 return  <PartnerManager/>;
             case 'AgencyPriceManager':
@@ -124,7 +135,19 @@ class DynamicContent extends React.Component {
             case 'PendingOrders_Sales':
                 return <PendingOrdersSales/>;
             case 'OrderDetails':
-                return <OrderDetails/>;
+                return <OrderDetails/>; 
+            case 'LicenseManager':
+                return <LicenseManager/>; 
+            //财务模块  
+            case 'AgencyPriceApproval':
+                return <AgencyPriceApproval/>;
+            case 'HistoryOrders':
+                return <HistoryOrders/>;
+            case 'PendingOrders_Finance':
+                return <PendingOrdersFinance/>;
+            case 'PartnerDetails':
+                return <PartnerDetails/>;
+
             case 'MyAccount':
                 return <AccountInfo/>;
             default :

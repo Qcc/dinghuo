@@ -248,12 +248,12 @@ class PwdModal extends React.Component{
 
 class AccountInfo extends React.Component{
     state = {
-        account:'金牌代理',
+        account:'销售经理',
         company:'', //代理商公司名称
         phone:'',
         contact:'',
         avatar:require('../../assets/avatar.jpg'), //用户头像
-        level:'金牌代理',
+        level:'销售经理',
     }
 
     infoUpdate=(data)=>{
@@ -268,8 +268,8 @@ class AccountInfo extends React.Component{
         });
     }
     componentDidMount() {
-        fetch(partenrInfo,this.infoUpdate);
-        fetch(partenrAccount,this.accountUpdate);        
+        //fetch(partenrInfo,this.infoUpdate);
+        //fetch(partenrAccount,this.accountUpdate);        
     }
     //弹出修改密码模态框,以下三行调用的是同ref回调传入父组件中的 子组件的引用
     modPwdClick=(e)=>{this.userModPwdModal.modPwdOpen();}
@@ -280,47 +280,47 @@ class AccountInfo extends React.Component{
 
     render(){
         return(
-                <div>
-                    <div className='usermod-title'>
-                        <h2>账户信息</h2> 
-                        <Button disabled className='usermod-edit-button'><Icon type="edit" />编辑</Button>
+                <div >
+                    <div style={{borderBottom:"1px solid #ccc"}}>
+                        <h2 style={{display:"inline-block"}}>账户信息</h2> 
+                        <Button disabled style={{float:"right"}}><Icon type="edit" />编辑</Button>
                     </div>
-                    <div className='usermod-avatar'>
-                        <img src={this.state.avatar} alt='头像'/>
+                    <div style={{position:"relative",width: "150px",height: "150px",margin: "10px",display:"inline-block"}}>
+                        <img style={{position:"absolute",left: "50%",top: "50%",marginLeft: "-40px",marginTop: "-40px"}} src={this.state.avatar} alt='头像'/>
                     </div>
-                    <div  className='usermod-info'>
-                        <div><span className='usermod-info-title'>伙伴等级 : </span><span>{this.state.account}</span><br/></div>
-                        <div><span className='usermod-info-title'>公司名称 : </span><span>{this.state.company}</span><br/></div>
-                        <div><span className='usermod-info-title'>手机 : </span><span>{this.state.phone}</span><br/></div>
-                        <div><span className='usermod-info-title'>联系人 : </span><span>{this.state.contact}</span><br/></div>                                                
+                    <div  style={{display: "inline-block"}}>
+                        <div style={{margin: "30px 0"}}><span className='usermod-info-title'>职位 : </span><span>{this.state.account}</span><br/></div>
+                        <div style={{margin: "30px 0"}}><span className='usermod-info-title'>所属部门 : </span><span>{this.state.company}</span><br/></div>
+                        <div style={{margin: "30px 0"}}><span className='usermod-info-title'>手机 : </span><span>{this.state.phone}</span><br/></div>
+                        <div style={{margin: "30px 0"}}><span className='usermod-info-title'>姓名: </span><span>{this.state.contact}</span><br/></div>                                                
                     </div>
-                    <div className='usermod-title'>
-                        <h2>账户安全</h2>
+                    <div style={{borderBottom:"1px solid #ccc"}}>
+                        <h2 style={{display:"inline-block"}}>账户安全</h2>
                     </div>
                     <div>
-                        <div className='usermod-safe-container'>
-                            <Icon className='usermod-safe-icon' type="unlock" />
-                            <div className='usermod-safe-title'>
+                        <div style={{position: "relative",margin: "40px 0",padding: "5px 0",borderBottom: "1px solid #eee"}}>
+                            <Icon style={{marginRight:"20px",fontSize:"36px",display: "inline-block"}} type="unlock" />
+                            <div style={{display: "inline-block"}}>
                                 <h3>帐号密码</h3>
                                 <p>用于保护帐号信息和登录安全</p>
                             </div>
-                            <Button onClick={this.modPwdClick}>修改</Button>
+                            <Button style={{position: "absolute",right: "10px"}} onClick={this.modPwdClick}>修改</Button>
                         </div>
-                        <div className='usermod-safe-container'>
-                            <Icon className='usermod-safe-icon' type="mail" />
-                            <div className='usermod-safe-title'>
+                        <div style={{position: "relative",margin: "40px 0",padding: "5px 0",borderBottom: "1px solid #eee"}}>
+                            <Icon style={{marginRight:"20px",fontSize:"36px",display: "inline-block"}} type="mail" />
+                            <div style={{display: "inline-block"}}>
                                 <h3>邮箱安全</h3>
                                 <p>安全邮箱可以用于登录，找回密码，修改其他密保信息，接收授权之用</p>
                             </div>
-                            <Button disabled onClick={this.modMailClick}>修改</Button>
+                            <Button style={{position: "absolute",right: "10px"}} disabled onClick={this.modMailClick}>修改</Button>
                         </div>
-                        <div className='usermod-safe-container'>
-                            <Icon className='usermod-safe-icon' type="solution" />
-                            <div className='usermod-safe-title'>
+                        <div style={{position: "relative",margin: "40px 0",padding: "5px 0",borderBottom: "1px solid #eee"}}>
+                            <Icon style={{marginRight:"20px",fontSize:"36px",display: "inline-block"}} type="solution" />
+                            <div style={{display: "inline-block"}}>
                                 <h3>密保问题</h3>
                                 <p>密保问题，可用于找回密码，验证身份之用</p>
                             </div>
-                            <Button disabled onClick={this.securityQuestionClick}>修改</Button>
+                            <Button style={{position: "absolute",right: "10px"}} disabled onClick={this.securityQuestionClick}>修改</Button>
                         </div>                                            
                     </div>
                     <PwdModal  ref={node=>this.userModPwdModal=node}></PwdModal>
