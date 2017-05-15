@@ -1,8 +1,7 @@
 import React from 'react';
 import {Button,Table, Input,InputNumber,Date, 
-        Icon,Modal,Form,Radio,Tooltip,Select,Cascader,
-      Row, Col, Checkbox,AutoComplete } from 'antd';
-import {licenseCountPager,partnerGetPager,generateTrail,getSumDelayDays,addUserNumberAndDelay,fetch} from '../../utils/connect';
+        Icon,Modal,Form,Radio,Tooltip} from 'antd';
+import {licenseCountPager,generateTrail,getSumDelayDays,addUserNumberAndDelay,fetch} from '../../utils/connect';
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 //修改授权码模态框
@@ -13,7 +12,7 @@ const formItemLayout = {
   },
   wrapperCol: {
     xs: { span: 24 },
-    sm: { span: 14 },
+    sm: { span: 16 },
   },
 };
 
@@ -70,229 +69,237 @@ class CopyIcon extends React.Component{
     }
 }
 
-const Option = Select.Option;
-const children=[];
+
 //申请临时授权界面
-class AskTemlLic extends React.Component{
-  state = {
-    loading:false,
-  };
-  //申请到授权回调
-  getLicUpdata=(data)=>{
-    this.setState({ loading: false});
+class AskTemlLicModal extends React.Component{
+  constructor(){
+    super();
+    this.state={
+      askTempLoading: false, //修改申请授权模态框加载状态
+      askTempVisible: false, //修改申请模态框是否可见
+      productId:3,// 1.CTBS高级版 2.CTBS企业版 3.云桌面
+      endUserCompany:'',//终端用户公司名称
+      endUserEmail:'',//终端用户邮箱
+      endUserName:'',//终端用户联系人
+      endUserPhone:'',//终端用户电话
+      userCompanyValid:'',
+      userCompanyHelp:'',
+      emailValid:'',
+      emailHelp:'',
+      nameValid:'',
+      nameHelp:'',
+      phoneValid:'',
+      phoneHelp:'',
+    };
+  }
+  
+  //表单input数据映射到state
+  endUserCompany=(e)=>{this.setState({endUserCompany:e.target.value});}
+  endUserEmail=(e)=>{this.setState({endUserEmail:e.target.value});}
+  endUserName=(e)=>{this.setState({endUserName:e.target.value});}
+  endUserPhone=(e)=>{this.setState({endUserPhone:e.target.value});}
+
+  //显示申请临时授权模态框界面
+  showModal = () => {
+    this.setState({
+      askTempVisible: true,
+    });
+  }
+ //申请临时授权回调
+  trailUpdate=(data)=>{
+    console.log("申请临时授权码："+JSON.stringify(data,null,4));
+    this.setState({ askTempLoading: false, askTempVisible: false });
     if(!data){
       Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
       return;    
     };
      Modal.success({title: '成功！',content:<CopyIcon cdk={data.entity}/>});
-    this.resetFields();      
+     //申请成功，清除表单数据。
+     this.setState({
+      endUserCompany:'',//终端用户公司名称
+      endUserEmail:'',//终端用户邮箱
+      endUserName:'',//终端用户联系人
+      endUserPhone:'',//终端用户电话
+     });  
   }
-  handleSubmit = (e) => {
-    e.preventDefault();
-    this.props.form.validateFieldsAndScroll((err, values) => {
-      if (!err) {
-        this.setState({
-          loading:true,
-        });
-        values.productId= +values.productId;
-        values.partnerId= +values.partnerId;
-        console.log('Received values of form: ', values);
-        fetch(generateTrail,this.getLicUpdata,values);
-        this.props.formCancel();
+  //确认申请临时授权
+  handleOk = () => {
+    let {productId,
+         endUserCompany,
+         endUserEmail,
+         endUserName,
+         endUserPhone,
+         userCompanyValid,
+         emailValid,
+         nameValid,
+         phoneValid,
+        }=this.state;
+    this.setState({ askTempLoading: true });
+    //用户信息必填
+    if(endUserCompany !== ''){
+      userCompanyValid='success';
+      this.setState({
+        userCompanyValid:'success',
+      });
+    }else{
+      this.setState({
+        userCompanyValid:'error',
+        userCompanyHelp:'请输入用户公司名称',
+        askTempLoading: false,
+      });
+    }
+    if(endUserEmail !== ''){
+         emailValid='success';
+      this.setState({
+        emailValid:'success',
+      });
+    }else{
+      this.setState({
+        emailValid:'error',
+        emailHelp:'请输入用户邮箱',
+        askTempLoading: false,
+      });
       }
+    if(endUserName !== ''){
+         nameValid='success';
+      this.setState({
+        nameValid:'success',
+      });
+    }else{
+      this.setState({
+        nameValid:'error',
+        nameHelp:'请输入用户姓名',
+        askTempLoading: false,
+      });
+      }
+    if(endUserPhone !== ''){
+         phoneValid='success';
+      this.setState({
+        phoneValid:'success',
+      });
+    }else{
+      this.setState({
+        phoneValid:'error',
+        phoneHelp:'请输入用户手机号码',
+        askTempLoading: false,
+      });
+    }
+    if(userCompanyValid ==='success' && emailValid ==='success' && nameValid ==='success' && phoneValid ==='success'){    
+      let params = {productId:productId,
+          endUserCompany:endUserCompany,
+          endUserEmail:endUserEmail,
+          endUserName:endUserName,
+          endUserPhone:endUserPhone,}
+          //请求数据
+          fetch(generateTrail,this.trailUpdate,params);
+      }
+
+  }
+  //取消申请临时授权
+  handleCancel = () => {
+    this.setState({ askTempVisible: false });
+  }
+  //选择申请授权的产品
+  handleProductChange = (e)=>{
+    this.setState({
+      productId: e.target.value,
     });
   }
-
-  //重置
-  resetFields=()=>{
-    this.props.form.resetFields();
-  }
-  formCancel=()=>{
-    this.props.handleCancel();
-    this.resetFields();
-  }
- 
-  //获取伙伴列表
-  partnerListUpdata=(data)=>{
-
-        if(data){
-            let list = data.entity.list;
-            for (let i = 0; i < data.entity.count; i++) {
-                children.push(<Option key={list[i].id}>{list[i].company}</Option>);
-            }
-        }else{
-            Modal.error({
-                  title: '错误',
-                  content: `获取伙伴列表失败,请稍后重试！`,
-                });
-            }
-    }
-    componentDidMount=()=>{
-        fetch(partnerGetPager,this.partnerListUpdata,{pageNO:1,pageSize:1000,ifGetCount:1})
-    }
-
   render() {
-    const { getFieldDecorator } = this.props.form;
-    const { autoCompleteResult } = this.state;
-
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 6 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 },
-      },
-    };
-    const formNumberLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 9 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 10},
-      },
-    };
-    const tailFormItemLayout = {
-      wrapperCol: {
-        xs: {
-          span: 24,
-          offset: 0,
-        },
-        sm: {
-          span: 14,
-          offset: 6,
-        },
-      },
-    };
-  
     return (
-      <Form onSubmit={this.handleSubmit}>
-        <FormItem
-          {...formItemLayout}
-          label="产品"
-          hasFeedback
-        >
-          {getFieldDecorator('productId', {
-            rules: [{
-              required: true, message: '请选择产品！',
-            }],
-          })(
-            <Select>
-                <option key={3}>沟通云桌面</option>
-                <option key={1}>CTBS高级版</option>
-                <option key={2}>CTBS企业版</option>                                              
-            </Select>
-          )}
-        </FormItem>
-        
-        <Row>
-            <Col offset="3" span="10">
-              <FormItem  {...formNumberLayout}
-                label="站点数"
-                hasFeedback
-              >
-                {getFieldDecorator('userNumber', {
-                  initialValue:3,
-                  rules: [{
-                    required: true, message: '请输入站点数!',
-                  }],
-                })(
-                  <InputNumber />
-                )}
-              </FormItem>
-            </Col>
-    
-            <Col span="11">
-              <FormItem   {...formNumberLayout}
-                label="试用天数"
-                hasFeedback
-              >
-                {getFieldDecorator('trailDay', {
-                  initialValue:15,
-                  rules: [{
-                    required: true, message: '请输入试用天数!',
-                  }],
-                })(
-                  <InputNumber />
-                )}
-              </FormItem>
-            </Col>
-        </Row>
-        
-        <FormItem
-          {...formItemLayout}
-          label="代理商"
-          hasFeedback
-        >
-          {getFieldDecorator('partnerId', {
-            rules: [{ required: true, message: '请选择代理商!' }],
-          })(
-            <Select
-                       showSearch
-                       style={{ width: 200 }}
-                       style={{ width: '100%' }}
-                       onChange={this.handlePartnerChange}
-                       filterOption={(value, option) => option.props.children.indexOf(value)!=-1}
-                     >
-                       {children}
-              </Select>
-          )}
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="用户公司"
-        >
-          {getFieldDecorator('endUserCompany', {
-            rules: [{required: true, message: '请输入终端用户公司名称!' }],
-          })(
-            <Input  />
-          )}
-        </FormItem>
+       <Modal
+        visible={this.state.askTempVisible}
+              title="申请临时授权"
+              onOk={this.handleOk}
+              onCancel={this.handleCancel}
+              footer={[
+                <Button key="back" size="large" onClick={this.handleCancel}>取消</Button>,
+                <Button key="submit" type="primary" size="large" loading={this.state.askTempLoading} onClick={this.handleOk}>
+                  申请
+                </Button>,
+              ]}>
+               <Form>
+                   <FormItem
+                     {...formItemLayout}
+                     label="产品"
+                     required
+                     validateStatus="success"
+                   >
+                       <RadioGroup onChange={this.handleProductChange} value={this.state.productId}>
+                          <Radio value={3}>沟通云桌面</Radio>
+                          <Radio value={1}>CTBS高级版</Radio>
+                          <Radio value={2}>CTBS企业版</Radio>
+                        </RadioGroup>
+                   </FormItem>
+                 
+                   <FormItem
+                     {...formItemLayout}
+                     required
+                     label="站点数"
+                     hasFeedback
+                     validateStatus="success"
+                   >
+                     <InputNumber disabled defaultValue={3} min={1} max={100}  id="validating" />
+                   </FormItem>
+                 
+                   <FormItem
+                     {...formItemLayout}
+                     label="试用时间(天)"
+                     required
+                     hasFeedback
+                     validateStatus="success"
+                   >
+                     <InputNumber disabled defaultValue={15} min={1} max={15}  id="validating" />
+                   </FormItem>
+                   
+                   <FormItem
+                     {...formItemLayout}
+                     label="公司名称"
+                     required
+                     hasFeedback
+                     validateStatus={this.state.userCompanyValid}
+                     help={this.state.userCompanyHelp}
+                   >
+                     <Input onChange={this.endUserCompany} value={this.state.endUserCompany} placeholder="客户公司名称" id="error" />
+                   </FormItem>
+                   
+                   <FormItem
+                     {...formItemLayout}
+                     label="邮箱"
+                     hasFeedback
+                     required
+                     validateStatus={this.state.emailValid}
+                     help={this.state.emailHelp}
+                   >
+                     <Input onChange={this.endUserEmail} value={this.state.endUserEmail} placeholder="客户邮箱" id="warning" />
+                   </FormItem>
 
-        <FormItem
-          {...formItemLayout}
-          label="用户联系人"
-        >
-          {getFieldDecorator('endUserName', {
-            rules: [{ required: true, message: '请输入终端用户联系人!' }],
-          })(
-            <Input  style={{width:"200px"}} />
-          )}
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="用户邮箱"
-        >
-          {getFieldDecorator('endUserEmail', {
-            rules: [{ required: true, message: '请输入终端用户邮箱!' }],
-          })(
-              <Input style={{width:"200px"}} />
-          )}
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="用户手机"
-        >
-              {getFieldDecorator('endUserPhone', {
-                rules: [{ required: true, message: '请输入终端用户手机!' }],
-              })(
-                <InputNumber style={{width:"200px"}}  />
-              )}   
-        </FormItem>
-         
-        <div style={{border: "1px #f50 dashed",padding: "5px",margin: "0 30px 20px"}}>
-                    <p><span style={{color: "#f50"}}>提示 ：</span>请务必将信息正确填写完整，当前填写信息将作为以后找回授权码、解除绑定等重要操作的依据。</p>
-        </div>
-
-        <FormItem {...tailFormItemLayout}>
-          <Button onClick={this.formCancel} size="large">取消</Button>
-          <Button style={{margin: "0 30px"}} type="dashed" onClick={this.resetFields} htmlType="submit" size="large">重置</Button>                    
-          <Button type="primary" loading={this.state.loading} htmlType="submit" size="large">确认申请</Button>
-        </FormItem>
-      </Form>
+                   <FormItem
+                     {...formItemLayout}
+                     label="联系人"
+                     hasFeedback
+                     required
+                     validateStatus={this.state.nameValid}
+                     help={this.state.nameHelp}
+                   >
+                     <Input onChange={this.endUserName} value={this.state.endUserName} placeholder="客户联系人" id="error" />
+                   </FormItem>
+                   
+                   <FormItem
+                     {...formItemLayout}
+                     label="手机"
+                     hasFeedback
+                     required
+                     validateStatus={this.state.phoneValid}
+                     help={this.state.phoneHelp}
+                   >
+                     <Input onChange={this.endUserPhone} value={this.state.endUserPhone} placeholder="客户手机" id="error" />
+                   </FormItem>
+             </Form>
+             <div style={{border: "1px #f50 dashed",padding: "5px",margin: "0 30px"}}>
+                <p><span style={{color: "#f50"}}>提示 ：</span>请务必将信息正确填写完整，当前填写信息将作为以后找回授权码、解除绑定等重要操作的依据。</p>
+             </div>
+        </Modal>
     );
   }
 }
@@ -326,7 +333,7 @@ class ModCdkModal extends React.Component{
     };
   //获取延期天数回调
   extensionDay=(data)=>{
-    if(data){
+    if(data.errorCode ===0){
       this.setState({
         remainingDate:data.entity[0],//剩余可延期的天数
         allowDay:data.entity[1], //默认允许延期的最大天数
@@ -365,14 +372,18 @@ class ModCdkModal extends React.Component{
   //加点 延期，回调处理
   numberAndDelayUpdate=(data)=>{
     this.setState({modCdkloading:false});    
-    if(!data){
+    if(data.status !== 200){
       Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
       return;    
     };
+    if(data.errorCode === 0){
       Modal.success({title: '成功！',content:'操作完成！'});
       //通过父组件 表格传入的 props 函数更新表格
       this.props.modTableCdk(this.state.key,this.state.newExpirationDate,this.state.userNumber);
-      this.handleCancel();      
+      }else{
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});      
+      }
+    this.handleCancel();      
   }
   //修改完成后，当点击保存按钮时，更新cdkey
   handleOk = () => {
@@ -595,8 +606,8 @@ class FilterTable extends React.Component {
 
   //表格组件加载时加载数据
   componentDidMount() {
-   this.setState({loading:true});    
-   fetch(licenseCountPager,this.licPagerUpdate,{type:0,pageNO:1,size:10}); //默认获取第一页，每页10行    
+    this.setState({loading:true});    
+    fetch(licenseCountPager,this.licPagerUpdate,{type:0,pageNO:1,size:10}); //默认获取第一页，每页10行    
   }
 
   //表头筛选部分
@@ -662,7 +673,16 @@ class FilterTable extends React.Component {
   onActivationSearch=(value, record)=>{
     console.log('onActivationSearch',value, record);
   }
-
+ 
+  //编辑某行
+  // onRowEdit=(text, record, index)=>{
+  //   console.log("text------",text,"record------",record, "index----- ", index)
+  //     return(<a onClick={this.onRowEditClick(text)}>加点与延期</a>);
+  // }
+  // onRowEditClick=(text)=>{
+  //   console.log("====text===",text);
+  // }
+  
 
   render() {
     //筛选input后缀，清除数据
@@ -749,11 +769,9 @@ class FilterTable extends React.Component {
         //编辑行
         render: (text, record, index) => {
           return (
-                    <div>
-                         <a onClick={()=>this.refsModCdkModal.showModal(record)}>加点与延期</a>                      
-                    </div> 
-                  );
-          }, 
+            this.state.data.length > 1 ?(<Button  onClick={()=>{this.refsModCdkModal.showModal(record);console.log("表格行",record);}} >加点与延期</Button>) : null
+          );
+      }, 
       }];
 
     
@@ -775,25 +793,12 @@ class FilterTable extends React.Component {
   }
 }
 
-const WrappedAskTemlLic = Form.create()(AskTemlLic);
+
  
 class LicenseManager extends React.Component{
-    state={
-      visible:false,
-      loading:false,
-    }
-   
-   //取消申请临时授权
-  handleCancel = () => {
-    this.setState({ visible: false });
-  }
-
-    //显示申请临时授权模态框界面
-    showAskTemlLic = () => {
-      console.log("11111");
-      this.setState({
-        visible: true,
-      });
+    //申请临时授权
+    handleAskTempLic(){
+      this.refsAskTemlLicModal.showModal();
     }
     
     render(){
@@ -801,18 +806,10 @@ class LicenseManager extends React.Component{
             <div>
                 <div style={{position: "relative",borderBottom: "1px solid #ccc",height: "32px",marginBottom: "10px"}}>
                     <h2>临时授权</h2> 
-                    <Button style={{position: "absolute",right: "10px",bottom: "5px"}} onClick={this.showAskTemlLic} type="primary">申请临时授权</Button>
+                    <Button style={{position: "absolute",right: "10px",bottom: "5px"}} onClick={()=>{this.handleAskTempLic()}} type="primary">申请临时授权</Button>
                 </div>
                 <FilterTable />
-                <Modal
-                  visible={this.state.visible}
-                  title="申请临时授权"
-                  onCancel={this.handleCancel}
-                  footer={null}>
-
-                      <WrappedAskTemlLic formCancel={this.handleCancel}/>
-                
-                </Modal>
+                <AskTemlLicModal ref={(node)=>this.refsAskTemlLicModal=node}/>
             </div>
         );
     }

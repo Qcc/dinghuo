@@ -90,7 +90,8 @@ export const orderapproval = ROOTURL + "/protected/order/approval.api";
 //确认到款
 export const ordertransfer = ROOTURL + "/protected/order/transfer.api";
 
-
+//临时授权
+export const licenseCountPager = ROOTURL + "/protected/license/getLicenseCountPager.api";
 
 //伙伴管理 曾 删 改 查
 export const partnerCreate = ROOTURL + "/protected/partner/create.api";
@@ -106,6 +107,16 @@ export const priceApproval = ROOTURL + "/protected/agencyprice/approval.api";
 //库存查询
 export const queryStockGetPager = ROOTURL + "/protected/stock/getPager.api";
 
+//产品查询
+export const productGetPager = ROOTURL + "/protected/partner/getPager.api";
+
+//临时授权
+export const generateTrail = ROOTURL +"/protected/license/generateTrail.api";
+//临时license 延期 加点
+export const addUserNumberAndDelay = ROOTURL+"/protected/license/addUserNumberAndDelay.api";
+
+//临时license 获取还可延期的天数
+export const getSumDelayDays = ROOTURL+"/protected/license/getSumDelayDays.api";
 
 //================mock data=================
 //财务

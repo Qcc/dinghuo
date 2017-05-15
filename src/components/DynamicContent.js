@@ -151,7 +151,7 @@ class DynamicContent extends React.Component {
             case 'MyAccount':
                 return <AccountInfo/>;
             default :
-                return <h1>{this.state.menuKey}</h1>;
+                return null;
         }
     }
     

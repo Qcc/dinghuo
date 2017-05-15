@@ -49,8 +49,8 @@ class DynamicMenu extends React.Component {
          var keys = this.state.defaultSelectedKeys;
          if(data.entity.length > 0) {
              //默认页面 
-             keys.push(data.entity[0].children[0].name);
-             groups.push(data.entity[0].name);
+             keys.push(data.entity[2].children[0].name);
+             groups.push(data.entity[2].name);
          }
         this.props.PubSub.publish(this.props.Topics.OnMenu, {menuKey:keys[0], menuItems:this.state.menuItems});
          this.setState({
