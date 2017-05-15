@@ -152,7 +152,7 @@ class AgencyPriceApproval extends React.Component {
     }
     fetch(priceApproval,this.onComplate,{"product.productId":this.state.editPrice.data.productId,
         "partner.id":this.state.editPrice.data.id,
-        "agencypriceValue":this.state.editPrice.data.value,
+        "value":this.state.editPrice.data.value,
          "pass":this.state.editPrice.data.pass},"POST");
   }
   

@@ -87,8 +87,8 @@ class EditModalForm extends React.Component {
         </FormItem>
 
         <FormItem {...formItemLayout} label="金额" >
-          {getFieldDecorator('sum', {
-              initialValue: this.props.record.sum,
+          {getFieldDecorator('money', {
+              initialValue: this.props.record.money,
             rules: [{ required: true, message: '请输入订单金额！' }],
           })(
             <Input disabled  type="phone" placeholder="请输入金额" />
@@ -263,7 +263,7 @@ class PendingOrdersFinance extends React.Component{
                 "productName":tempArray[i].product && tempArray[i].product.productName,
                 "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
                 "points":tempArray[i].points,
-                "sum":tempArray[i].sum,
+                "money":tempArray[i].money,
                 "state":tempArray[i].state,  
                 "stateName":this.stateName(tempArray[i].state),                                              
                 "sales":tempArray[i].user && tempArray[i].user.name,
@@ -366,7 +366,7 @@ class PendingOrdersFinance extends React.Component{
           dataIndex: 'points',
         }, {
           title: '金额',
-          dataIndex: 'sum',
+          dataIndex: 'money',
         }, {
           title: '状态',
           dataIndex: 'stateName',

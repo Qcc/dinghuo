@@ -149,7 +149,7 @@ class AgencyPriceManager extends React.Component {
     if (this.state.editPrice.data.value !== this.state.editPrice.data.tempValue) {        
         fetch(priceApply,this.onComplate,{"product.productId":this.state.editPrice.data.productId,
                     "partner.id":this.state.editPrice.data.id,
-                    "agencypriceValue":this.state.editPrice.data.value},"POST");
+                    "value":this.state.editPrice.data.value},"POST");
     }
     console.log("value ",this.state.editPrice.data.value,"---","tempValue ",this.state.editPrice.data.tempValue);
   }
@@ -193,7 +193,7 @@ class AgencyPriceManager extends React.Component {
           render: (text, record, index) => {
                   return (
                     <div>
-                        <a onClick={()=>this.editRow(record)}>{this.state.data.state?"修改代理价":"申请代理价"}</a>
+                        <a onClick={()=>this.editRow(record)}>{record.value?"修改代理价":"申请代理价"}</a>
                     </div> 
                   );
               }, 

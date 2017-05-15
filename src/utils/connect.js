@@ -10,7 +10,7 @@ ajax请求函数
 @params 请求参数对象
 */
 //获取
-export function fetch(url,onComplete,params = {},method='GET'){
+export function fetch(url,onComplete,params = {},method='POST'){
     console.log("调用了fecth =",'url',url,'method',method,'params:', params);
     if(typeof onComplete !== 'function'){
         console.log("成功获取到数据,回调函数不正确",onComplete);
@@ -42,7 +42,7 @@ export function fetch(url,onComplete,params = {},method='GET'){
 };
 
 //特殊操作
-export function fetch2(url,onComplete,params = {},method='GET'){
+export function fetch2(url,onComplete,params = {},method='POST'){
     console.log("调用了fecth =",'url',url,'method',method,'params:', params);
     if(typeof onComplete !== 'function'){
         console.log("成功获取到数据,回调函数不正确",onComplete);

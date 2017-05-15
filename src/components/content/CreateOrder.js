@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, InputNumber, Input,Col,Button,Select,Tooltip,Icon,Modal } from 'antd';
-import {fetch,orderCreate,partnerGetPager} from '../../utils/connect';
+import {fetch,fetch2,orderCreate,partnerGetPager} from '../../utils/connect';
 const Option = Select.Option;
 const FormItem = Form.Item;
 const formItemLayout = {
@@ -23,8 +23,8 @@ class CreateOrder extends React.Component{
            loading:false,  //提交按钮加载icon
            submit:false,  // 订单是否重复
            data:{
-                partnerId:null,
-                productId:3,
+                partner:{id:null},
+                product:{productId:3},
                 points:50,
                 money:null,
                 comment:'',
@@ -58,7 +58,7 @@ class CreateOrder extends React.Component{
     //选择公司
     handlePartnerChange=(value)=>{
         let state = {...this.state.data};
-            state.partnerId=value;
+            state.partner.id = +value;
             this.setState({
                 data:state,
                 partnerIdValid:"",
@@ -69,7 +69,7 @@ class CreateOrder extends React.Component{
     //选择产品
     handleProductChange=(value)=>{
         let state = {...this.state.data};
-            state.productId=value;
+            state.product.productId=value;
             this.setState({
                 data:state,
                 submit:false,
@@ -133,7 +133,7 @@ class CreateOrder extends React.Component{
             return;
         }
         let flag=true;
-        if(!this.state.data.partnerId){
+        if(!this.state.data.partner.id){
             this.setState({
                 partnerIdValid:"error",
                 partnerIdHelp:"代理商公司名称不能为空", 
@@ -158,7 +158,7 @@ class CreateOrder extends React.Component{
             this.setState({
                 loading:true,
             });
-            fetch(orderCreate,this.orderCreateUpdata,this.state.data)
+            fetch2(orderCreate,this.orderCreateUpdata,this.state.data)
         }
     }
 
