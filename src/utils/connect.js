@@ -74,7 +74,9 @@ export function fetch2(url,onComplete,params = {},method='POST'){
 
 
 //退出
-export const logoutApi =ROOTURL +' /public/user/logout.api';
+
+//登录
+export const logoutApi =ROOTURL +' /public/user/koutonlogin.api';
 //动态菜单
 export const dynamicMenuApi = ROOTURL + '/protected/dynamicmenu/get.api';
 //订单管理 曾 删 改 查

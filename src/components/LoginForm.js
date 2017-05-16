@@ -42,7 +42,6 @@ class LoginForm extends React.Component {
                 validateCode: paras.validateCode
             },
             error: function (err) {
-                console.dir(err);
                 that.leaveLoading();
                 Modal.error({
                     title: '登录失败',
@@ -52,7 +51,6 @@ class LoginForm extends React.Component {
             },
             success: function (resp) {
                 that.leaveLoading();
-                console.dir(resp);
                 if(resp.errorCode == 0) {
                     window.location.href = that.props.loginSuccessURL;
                 }
@@ -78,7 +76,6 @@ class LoginForm extends React.Component {
         e.preventDefault(); //阻止form跳转
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                console.log('Received values of form: ', values);
                 this.loginRequest(values);
             }
             else { this.leaveLoading(); }

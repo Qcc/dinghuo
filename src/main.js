@@ -31,7 +31,7 @@ const CommonProps = {
 //     }
 // }
 
-let indexURL = "http://192.168.200.104:8000/main.html";
+let indexURL = "http://192.168.200.104:8000/dinghuo/kouton/index.html";
 
 function onClickMenu(e) {
     if(e.key == 'logout') {
