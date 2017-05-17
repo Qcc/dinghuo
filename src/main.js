@@ -21,17 +21,11 @@ const CommonProps = {
     PubSub: PubSub,
 };
 
-// window.singleton = { //新的方式，实现在所有组件间共享对象、共享配置
-//     share: {
-//         Topics: Topics,
-//         PubSub: PubSub
-//     },
-//     config: {
-//         ServerRootURL: 'http://192.168.200.104:8080/dinghuo/'
-//     }
-// }
+ 
 
-let indexURL = "http://192.168.200.104:8000/dinghuo/kouton/index.html";
+//let indexURL = "http://192.168.200.104:8000/dinghuo/kouton/index.html";
+let indexURL = "http://localhost:8000/index.html";
+
 
 function onClickMenu(e) {
     if(e.key == 'logout') {
