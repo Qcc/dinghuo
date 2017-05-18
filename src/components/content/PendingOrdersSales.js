@@ -19,7 +19,17 @@ class EditModalForm extends React.Component {
 
     //确认编辑数据后的回调
   onComplate=(data)=>{
-    if(data){
+    this.props.form.resetFields();
+       if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+     
+        //成功拿到数据
         //表格重新加载数据
         this.props.handleEditCancel();
         this.props.componentDidMount();
@@ -27,14 +37,7 @@ class EditModalForm extends React.Component {
               title: '成功',
               content: '编辑订单成功！',
         });
-    }else{
-        this.props.handleEditCancel();
-        Modal.error({
-              title: '错误',
-              content: '服务器错误，伙伴订单失败，请稍后重试！',
-            });
-    }
-    this.props.form.resetFields();
+     
   }
    
     //取消编辑 并重置表单
@@ -171,13 +174,19 @@ class PendingOrdersSales extends React.Component{
 
     //获取数据后映射到 table state
     callbackDate = (data) => {
-        if(!data){
-            Modal.error({
-              title: '错误',
-              content: '服务器错误，请稍后刷新（F5）重试！',
-            });
-            return;
-        }
+         this.setState({
+            loading:false,
+        });
+           if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    if(data.entity !== null){
+        //成功拿到数据
         let pager = this.state.pagination;
             pager.total=data.entity.count;
         let tempArray = data.entity.list;
@@ -200,8 +209,8 @@ class PendingOrdersSales extends React.Component{
             loading:false,
             data:sourceData,
             pagination:pager,
-        },()=>{console.log("1111",this.state.data.state)});
-
+        });
+    }
     }
      
     componentDidMount=()=>{
@@ -241,12 +250,19 @@ class PendingOrdersSales extends React.Component{
     }
     //删除行回调
     deleteUpdate=(data)=>{
-        if(data){
+           if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    
+        //成功拿到数据
             message.success('删除订单成功');
             this.componentDidMount();
-        }else{
-            message.error('删除订单失败，请稍后再试！');
-        }
+         
     }
 
     //删除行
@@ -258,12 +274,19 @@ class PendingOrdersSales extends React.Component{
     }
     //发货回调
     deliveryUpdate=(data)=>{
-        if(data){
+           if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    
+        //成功拿到数据
             message.success('发货成功');
             this.componentDidMount();
-        }else{
-            message.error('发货失败，请稍后再试！');
-        }
+         
     }
     //发货
     confirmDelivery=()=>{

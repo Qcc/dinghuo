@@ -66,15 +66,15 @@ class PwdModal extends React.Component{
             modPwdVisible:false,
             loading:false,
         });
-        if(data.status !== 200 || data.errorCode !== 0){
-            Modal.error({title: '错误！',content: '密码未修改,'+data.message});
-            this.setState({
-                    validateMode:this.state.validateMode+1,
-                });
-            return;
-        }else{
+            if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
             Modal.success({title: '完成！',content: '密码修改成功。'});            
-        }
     }
     //确定修改密码
     makeModPwd=(e)=>{

@@ -76,13 +76,19 @@ class AgencyPriceManager extends React.Component {
 
     //获取数据后映射到 table state
     priceUpdate = (data) => {
-        if(!data){
-            Modal.error({
-              title: '错误',
-              content: '服务器错误，请稍后刷新（F5）重试！',
-            });
-            return;
-        }
+         this.setState({
+            loading:false,
+        });
+           if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    if(data.entity !== null){
+        //成功拿到数据
         function state(state){
             let s='';
             switch(state){
@@ -120,6 +126,7 @@ class AgencyPriceManager extends React.Component {
             pagination:pager,
         });
     }
+    }
 
     componentDidMount=()=>{
         fetch(priceGetPager,this.priceUpdate,{pageNO:1,size:10,ifGetCount:1});
@@ -128,19 +135,23 @@ class AgencyPriceManager extends React.Component {
 
       //确认编辑数据后的回调
   onComplate=(data)=>{
-    if(data){
+        if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+     
+        //成功拿到数据
         //表格重新加载数据
         this.componentDidMount();
         Modal.success({
               title: '成功',
               content: '申请代理价成功，等待财务审核。',
         });
-    }else{
-        Modal.error({
-              title: '错误',
-              content: '服务器错误，申请代理价格失败，请稍后重试！',
-            });
-    }
+     
   }
   
   handleSubmit = (e) => {

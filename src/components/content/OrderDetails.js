@@ -52,13 +52,19 @@ class OrderDetails extends React.Component{
 
     //获取数据后映射到 table state
     callbackDate = (data) => {
-        if(!data){
-            Modal.error({
-              title: '错误',
-              content: '服务器错误，请稍后刷新（F5）重试！',
-            });
-            return;
-        }
+         this.setState({
+            loading:false,
+        });
+           if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    if(data.entity !== null){
+        //成功拿到数据
         let pager = this.state.pagination;
             pager.total=data.entity.count;
         let tempArray = data.entity.list;
@@ -85,7 +91,8 @@ class OrderDetails extends React.Component{
             loading:false,
             data:sourceData,
             pagination:pager,
-        },()=>{console.log("1111",this.state.data.state)});
+        });
+    }
 
     }
      

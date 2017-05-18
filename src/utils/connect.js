@@ -27,13 +27,13 @@ export function fetch(url,onComplete,params = {},method='POST'){
       type: 'json',
     })
     .then((data) => {
-        if(data.status === 200 && data.errorCode === 0){
+        if(data.status === 200){
             console.log("成功获取到数据 ",JSON.stringify(data,null,4));
             onComplete(data);
-            return;
+        }else{
+            onComplete(null);          
+            console.log("服务器错误 ",JSON.stringify(data,null,4));          
         }
-        console.log("服务器错误 ",JSON.stringify(data,null,4)); 
-        onComplete(null);         
         })
     .fail((err,msg)=>{
         console.log("err ",err,"msg ",msg);
@@ -57,14 +57,14 @@ export function fetch2(url,onComplete,params = {},method='POST'){
       dataType: 'json',
       contentType: 'application/json;charset=utf-8'
     })
-    .then((data) => {
-        if(data.status === 200 && data.errorCode === 0){
+     .then((data) => {
+        if(data.status === 200){
             console.log("成功获取到数据 ",JSON.stringify(data,null,4));
             onComplete(data);
-            return;
+        }else{
+            onComplete(null);          
+            console.log("服务器错误 ",JSON.stringify(data,null,4));          
         }
-        console.log("服务器错误 ",JSON.stringify(data,null,4)); 
-        onComplete(null);         
         })
     .fail((err,msg)=>{
         console.log("err ",err,"msg ",msg);

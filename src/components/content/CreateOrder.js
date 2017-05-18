@@ -39,18 +39,21 @@ class CreateOrder extends React.Component{
     }
 
     partnerListUpdata=(data)=>{
-        console.log("shuju ",data);
-        if(data){
+            if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    if(data.entity !== null){
+        //成功拿到数据
             let list = data.entity.list;
             for (let i = 0; i < data.entity.count; i++) {
                 children.push(<Option key={list[i].id}>{list[i].company}</Option>);
             }
-        }else{
-            Modal.error({
-                  title: '错误',
-                  content: `获取伙伴列表失败,请稍后重试！`,
-                });
-            }
+        } 
     }
     componentDidMount=()=>{
         fetch(partnerGetPager,this.partnerListUpdata,{pageNO:1,pageSize:1000,ifGetCount:1})
@@ -111,17 +114,22 @@ class CreateOrder extends React.Component{
             loading:false,
             submit:true,
         });
-        if(data){
+           if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+     
+        //成功拿到数据
         Modal.success({
               title: '成功',
               content: '创建订单成功！等待财务审核。',
         });
-        }else{
-        Modal.error({
-              title: '错误',
-              content: `创建订单失败，请稍后重试！`,
-            });
-        }
+        
+     
     }
     handleSubmit=(e)=>{
         e.preventDefault();
