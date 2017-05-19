@@ -1,6 +1,6 @@
 import React from 'react';
-import { Table,Icon,Button,Modal,Form,Input,Select,Popconfirm,Tooltip} from 'antd';
-import {fetch,fetch2,partnerCreate,partnerdisable,partnerUpdate,partnerGetPager} from '../../utils/connect';
+import { Table,Icon,Button,Modal,Form,Input,Select } from 'antd';
+import {fetch,fetch2,partnerCreate,partnerUpdate,partnerDelete,partnerGetPager} from '../../utils/connect';
 
 const formItemLayout = {
   labelCol: {
@@ -131,15 +131,133 @@ class AddModalForm extends React.Component {
   }
 }
 
+class EditModalForm extends React.Component {
+
+    //确认编辑数据后的回调
+  onComplate=(data)=>{
+       if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    if(data.entity !== null){
+        //成功拿到数据
+        //表格重新加载数据
+        this.props.handleEditCancel();
+        this.props.componentDidMount();
+        Modal.success({
+              title: '成功',
+              content: '编辑伙伴成功！',
+        });
+     
+    }
+    this.props.form.resetFields();
+  }
+   
+    //取消编辑 并重置表单
+  handleCancel=()=>{
+      this.props.handleEditCancel();
+      this.props.form.resetFields();
+  }
+  handleSubmit = (e) => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+          let param = {
+            condition: {id:this.props.record.id},
+            entity: values
+          }
+          fetch2(partnerUpdate,this.onComplate,param,"POST");
+      }
+    });
+  }
+  render() {
+    const { getFieldDecorator } = this.props.form;
+    return (
+      <Form onSubmit={this.handleSubmit} >
+
+         <FormItem {...formItemLayout} label="代理商级别" required>
+                {getFieldDecorator('level', {initialValue: 'ordinary',
+                     })(
+                    <Select>
+                       <Option value="ordinary">普通代理</Option>
+                       <Option value="gold">金牌代理</Option>                       
+                       <Option value="isv">ISV合作</Option>
+                     </Select>
+                    )}
+        </FormItem>
+
+        <FormItem {...formItemLayout} label="公司名称" >
+          {getFieldDecorator('company', {
+              initialValue: this.props.record.company,
+            rules: [{ required: true, message: '请输入代理商公司名称!' }],
+          })(
+            <Input type="text" placeholder="请输入代理商公司名称" />
+          )}
+        </FormItem>
+
+        <FormItem {...formItemLayout} label="联系人" >
+          {getFieldDecorator('name', {
+              initialValue: this.props.record.name,
+            rules: [{ required: true, message: '请输入代理商联系人姓名!' }],
+          })(
+            <Input type="text" placeholder="请输入代理商联系人" />
+          )}
+        </FormItem>
+
+        <FormItem {...formItemLayout} label="电话" >
+          {getFieldDecorator('phone', {
+              initialValue: this.props.record.phone,
+            rules: [{ required: true, message: '请输入代理商联系人电话!' }],
+          })(
+            <Input type="phone" placeholder="请输入代理商电话" />
+          )}
+        </FormItem>
+
+        <FormItem {...formItemLayout} label="邮箱" >
+          {getFieldDecorator('enail', {
+              initialValue: this.props.record.email,
+            rules: [{ required: true, message: '请输入代理商邮箱地址!' },
+             {type:"email",message:"输入的邮箱不正确!"}],
+          })(
+            <Input type="mail" placeholder="请输入代理商邮箱" />
+          )}
+        </FormItem>
+
+        <FormItem {...formItemLayout} label="地址" >
+          {getFieldDecorator('address', {
+              initialValue: this.props.record.address,
+            rules: [{ required: true, message: '请输入代理商地址!' }],
+          })(
+            <Input type="text" placeholder="请输入代理商地址" />
+          )}
+        </FormItem>
+        <br />
+        <FormItem>
+        <div style={{textAlign:"center"}}>
+          <Button style={{width:"110px",marginRight:"10px"}} onClick={this.handleCancel}>取消</Button>
+          <Button type="dashed" style={{width:"110px",marginRight:"10px"}}
+                  onClick={()=>{this.props.form.resetFields()}}>重置</Button>
+          <Button type="primary" htmlType="submit"  style={{width:"110px"}}>确定</Button>          
+        </div>  
+        </FormItem>
+
+      </Form>
+    );
+  }
+}
 
 const WrapAddModalForm = Form.create()(AddModalForm);
+const WrapEditModalForm = Form.create()(EditModalForm);
 class PartnerManager extends React.Component {
     constructor(props) { super(props); }
 
     state = {
-        data: [],//表格数据
-        record:{},//需要修改的行
-        loading: true, //表格加载中
+        data: [],
+        loading: false, //表格加载中
         pagination: { //分页器
                 showSizeChanger:true, //是否可设置每页显示多少行
                 defaultCurrent:1, //默认页码
@@ -153,7 +271,16 @@ class PartnerManager extends React.Component {
                 visibleAdd:false, //添加按钮点击  模态框 是否可见
                 loadingAdd:false,   //确认按钮加载中
             },
-      
+        editModal:{
+                visibleEdit:false, //编辑按钮  模态框 是否可见        
+                loadingEdit:false,     
+                data:{},//待编辑行对象                                                                   
+            },
+        deleteModal:{
+                visibleDelete:false, //删除按钮  模态框 是否可见
+                loadingDelete:false,
+                data:{},//待删除行对象                                        
+        },
     };
 
     handleTableChange = (pagination, filters, sorter) => { //当点击页面下标时，这里传入的pagination.current指向了新页面
@@ -202,7 +329,6 @@ class PartnerManager extends React.Component {
         let tempArray = data.entity.list;
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
-          if(tempArray[i].state === 1) continue;
             sourceData.push({ 
                 "serial":i+1,
                 "id":tempArray[i].id,
@@ -211,9 +337,7 @@ class PartnerManager extends React.Component {
                 "company":tempArray[i].company,
                 "level":this.partnerLevel(tempArray[i].level),
                 "email":tempArray[i].email,
-                "phone":tempArray[i].phone,   
-                "statusName":tempArray[i].state?"已禁用":"正常",
-                "status":tempArray[i].state,                                             
+                "phone":tempArray[i].phone,                
                 "user":tempArray[i].salesUser && tempArray[i].salesUser.employee &&
                         tempArray[i].salesUser.employee.name,
             });
@@ -228,6 +352,9 @@ class PartnerManager extends React.Component {
     
     //首次加载组件 获取数据
     componentDidMount=()=>{
+        this.setState({
+            loading:true,
+        });
         // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
         fetch(partnerGetPager,this.callbackDate);
     }
@@ -248,32 +375,82 @@ class PartnerManager extends React.Component {
         });
     }
 
-    parnterUpdate=(data)=>{
-      if(data === null){
-          Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
-          return;    
-          };
-          if(data.errorCode !== 0){
-              Modal.error({title: '错误！',content:'服务器错误,'+data.message});
-              return;
-          }
-          Modal.success({title: '成功',content:'操作成功'});
-          this.componentDidMount();
-    }
-    //禁用启用
-    handleEnableOk=(record)=>{
-      console.log("确定",record);      
-      record.status= record.status === 2?0:2;
-        fetch(partnerdisable,this.parnterUpdate,{"partnerId":record.id,"state":record.status},"POST");
-    }
-    editTable=(record)=>{
-      return <Popconfirm title={record.status === 1?"您确定要该启用代理商吗?":"您确定要该禁用代理商吗?"} 
-                onConfirm={()=>this.handleEnableOk(record)} 
-                okText="确认" cancelText="取消">
-                <a>{record.status===2?"启用":"禁用"}</a>
-              </Popconfirm>;
-    }
 
+    //编辑表格行
+    editRow=(record)=>{
+        
+        let state = {...this.state.editModal};
+            state.visibleEdit=true;
+        //深拷屏
+        Object.assign(state.data,record);
+        this.setState({
+            editModal:state,
+        });
+    }
+    // handleEditOk=()=>{
+    //     let state = {...this.state.editModal};
+    //         state.loadingEdit=true;
+    //     this.setState({
+    //         editModal:state,
+    //     });
+    // }
+    handleEditCancel=()=>{
+        let state = {...this.state.editModal};
+            state.visibleEdit=false;
+            state.loadingEdit=false;            
+        this.setState({
+            editModal:state,
+        });
+    }    
+
+     //删除表格行
+    deleteRow=(record)=>{
+        let state = {...this.state.deleteModal};
+            state.visibleDelete=true;
+            //深拷屏
+            Object.assign(state.data,record);
+        this.setState({
+            deleteModal:state,
+        });
+    }
+    //删除行回调
+    deleteUpdate=(data)=>{
+        this.handleDeleteCancel();
+           if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    if(data.entity !== null){
+        //成功拿到数据
+            //表格重新加载数据
+            this.componentDidMount();
+            Modal.success({
+                  title: '成功',
+                  content: '删除伙伴成功！',
+                });
+        
+        }
+    }
+    handleDeleteOk=()=>{
+        let state = {...this.state.deleteModal};
+            state.loadingDelete=true;
+        this.setState({
+            deleteModal:state,
+        });
+        fetch(partnerDelete,this.deleteUpdate,{"id":this.state.deleteModal.data.id},"POST");
+    }
+    handleDeleteCancel=()=>{
+        let state = {...this.state.deleteModal};
+            state.visibleDelete=false;
+            state.loadingDelete=false;
+        this.setState({
+            deleteModal:state,
+        });
+    }
 
 
     render() {
@@ -297,18 +474,16 @@ class PartnerManager extends React.Component {
           title: '代理商级别',
           dataIndex: 'level',
         }, {
-          title: '状态',
-          dataIndex: 'statusName',
-        }, {
           title: '销售代表',
           dataIndex: 'user',
         },{
-          title: <Tooltip placement="left" title='禁用后代理商将不能再登录伙伴系统'>操作</Tooltip>,
+          title: '操作',
           dataIndex: 'edit',
           render: (text, record, index) => {
                   return (
-                      <div>
-                        {this.editTable(record)}
+                    <div>
+                        <a onClick={()=>this.editRow(record)}>编辑</a>
+                        { " / " }<a onClick={()=>this.deleteRow(record)}>删除</a>
                     </div> 
                   );
               }, 
@@ -338,7 +513,36 @@ class PartnerManager extends React.Component {
                                  componentDidMount={this.componentDidMount}
                                 />
             </Modal>
- 
+
+            <Modal
+              visible={this.state.editModal.visibleEdit}
+              title="修改伙伴"
+              //onOk={this.handleEditOk}
+              onCancel={this.handleEditCancel}
+              footer={null}
+            >
+               <WrapEditModalForm record={this.state.editModal.data} 
+                                  handleEditCancel={this.handleEditCancel} 
+                                  componentDidMount={this.componentDidMount}
+                                 />
+            </Modal>
+
+            <Modal
+              visible={this.state.deleteModal.visibleDelete}
+              title="删除伙伴"
+              onOk={this.handleDeleteOk}
+              onCancel={this.handleDeleteCancel}
+              footer={[
+                <Button key="back" size="large" onClick={this.handleDeleteCancel}>取消</Button>,
+                <Button key="submit" type="primary" size="large" loading={this.state.deleteModal.loadingDelete} onClick={this.handleDeleteOk}>
+                  确认
+                </Button>,
+              ]}
+            >
+            <div style={{lineHeight:"34px",height:"34px"}}>
+              <Icon style={{margin:"20px",color:"#ffbf00",fontSize:"24px"}} type="exclamation-circle" />
+                    您确认要删除该该代理商吗？</div>
+            </Modal>
             </div>);
     }
 }

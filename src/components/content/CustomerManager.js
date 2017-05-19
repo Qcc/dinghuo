@@ -317,8 +317,8 @@ class PartnerManager extends React.Component {
         return (
             <div>
                 <div style={{position:'relative',marginBottom:"5px"}}>
-                <h2 style={{display:'inline-block'}}>伙伴管理</h2>
-                <Button type="primary" onClick={this.createNewItem} style={{position:"absolute",right:0}}>新建伙伴</Button>
+                <h2 style={{display:'inline-block'}}>直销客户管理</h2>
+                <Button type="primary" onClick={this.createNewItem} style={{position:"absolute",right:0}}>新建直销客户</Button>
                 </div>
             <Table bordered columns={Columns}
                 rowKey={record => record.serial}          //Table.rowKey：表格行 key 的取值，可以是字符串或一个函数 （我的理解：给每一行一个唯一标识）

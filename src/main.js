@@ -24,8 +24,8 @@ const CommonProps = {
 
  
 
-let indexURL = "http://192.168.200.104:8000/dinghuo/kouton/index.html";
-//let indexURL = "http://localhost:8000/index.html";
+//let indexURL = "http://192.168.200.104:8000/dinghuo/kouton/index.html";
+let indexURL = "http://localhost:8000/index.html";
 
 
 

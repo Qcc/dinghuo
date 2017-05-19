@@ -192,6 +192,7 @@ class PendingOrdersSales extends React.Component{
         let tempArray = data.entity.list;
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
+            if(tempArray[i].state !== 4){
             sourceData.push({ 
                 "serial":i+1,
                 "id":tempArray[i].id,
@@ -204,6 +205,7 @@ class PendingOrdersSales extends React.Component{
                 "stateName":this.stateName(tempArray[i].state),                                              
                 "sales":tempArray[i].user && tempArray[i].user.name,
             });
+            }
         }
         this.setState({
             loading:false,

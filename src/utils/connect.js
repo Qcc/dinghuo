@@ -11,7 +11,7 @@ ajax请求函数
 */
 //获取
 export function fetch(url,onComplete,params = {},method='POST'){
-    // console.log("调用了fecth =",'url',url,'method',method,'params:', params);
+    console.log("调用了fecth =",'url',url,'method',method,'params:', params);
     if(typeof onComplete !== 'function'){
         // console.log("成功获取到数据,回调函数不正确",onComplete);
         return;
@@ -28,7 +28,7 @@ export function fetch(url,onComplete,params = {},method='POST'){
     })
     .then((data) => {
         if(data.status === 200){
-            // console.log("成功获取到数据 ",JSON.stringify(data,null,4));
+            console.log("成功获取到数据 ",JSON.stringify(data,null,4));
             onComplete(data);
         }else{
             onComplete(null);          
@@ -100,6 +100,7 @@ export const partnerCreate = ROOTURL + "/protected/partner/create.api";
 export const partnerUpdate = ROOTURL + "/protected/partner/update.api";
 export const partnerDelete = ROOTURL + "/protected/partner/delete.api";
 export const partnerGetPager = ROOTURL + "/protected/partner/getPager.api";
+export const partnerdisable = ROOTURL + "/protected/partner/disable.api";
 
 //价格管理
 export const priceGetPager = ROOTURL + "/protected/agencyprice/getPager.api";

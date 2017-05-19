@@ -7,6 +7,8 @@ import LicenseManager from './content/LicenseManager'
 import PendingOrdersSales from './content/PendingOrdersSales'
 import OrderDetails from './content/OrderDetails'
 import PartnerManager from './content/PartnerManager';
+import CustomerManager from './content/CustomerManager';
+
 import AgencyPriceManager from './content/AgencyPriceManager';
 // import {orderCreate,orderUpdate,orderDelete,orderGetPager,
 //         partnerCreate,partnerUpdate,partnerDelete,partnerGetPager,} from '../utils/connect';
@@ -137,6 +139,8 @@ class DynamicContent extends React.Component {
                 return <OrderDetails/>; 
             case 'LicenseManager':
                 return <LicenseManager/>; 
+            case 'CustomerManager':
+                return <CustomerManager/>; 
             //财务模块  
             case 'AgencyPriceApproval':
                 return <AgencyPriceApproval/>;
@@ -150,7 +154,7 @@ class DynamicContent extends React.Component {
             case 'MyAccount':
                 return <AccountInfo/>;
             default :
-                return null;
+                return <h1>{menuItem}</h1>;
         }
     }
     
