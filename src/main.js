@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Layout, Menu, Icon, Button } from 'antd';
+import { Layout, Menu, Icon, Button,Modal } from 'antd';
 import PubSub from 'pubsub-js';
 import Loading from './components/Loading.js';
 import DynamicMenu from './components/DynamicMenu.js';
@@ -10,6 +10,7 @@ import KtFooter from './components/Footer.js';
 import {fetch,logoutApi} from './utils/connect';
 import styles from "./styles/main.css";
 
+const confirm = Modal.confirm;
 const { Header, Content, Footer, Sider } = Layout;
 const Topics = {
     Loading: 'PageLoadingStateChange',
@@ -23,18 +24,29 @@ const CommonProps = {
 
  
 
-//let indexURL = "http://192.168.200.104:8000/dinghuo/kouton/index.html";
-let indexURL = "http://localhost:8000/index.html";
+let indexURL = "http://192.168.200.104:8000/dinghuo/kouton/index.html";
+//let indexURL = "http://localhost:8000/index.html";
 
 
-function onClickMenu(e) {
-    if(e.key == 'logout') {
-        fetch(logoutApi,(resp)=> {
-            if(resp.errorCode == 0)
-                window.location.href = indexURL;
-        },{});
+
+//确认是否退出
+    function showConfirm(){
+      confirm({
+        title: '请确认',
+        content: '要退出当前登录的账户吗？',
+        onOk() {
+          fetch(logoutApi,(data)=>{
+            if(data.errorCode === 0){
+              window.location.href = indexURL;      
+            }
+          });
+        },
+        onCancel() {
+        },
+      }); 
     }
-}
+
+  
 
 ReactDOM.render(
     <div>
@@ -45,7 +57,7 @@ ReactDOM.render(
                 theme="dark"
                 mode="horizontal"
                 style={{ lineHeight: '64px' }}
-                onClick= { onClickMenu }>
+                onClick= {showConfirm }>
               <Menu.Item key="home">首页</Menu.Item>
               <Menu.Item key="neworders">最新订单</Menu.Item>
               <Menu.Item key="logout" style={{float:'right'}}><Icon type="logout" />退出</Menu.Item>

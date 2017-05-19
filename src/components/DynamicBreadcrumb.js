@@ -30,7 +30,6 @@ class DynamicBreadcrumb extends React.Component {
     }
 
     render() {
-        console.dir('DynamicBreadcrumb.render');
 
         function recursiveFind(menuItems, target) {
             for(var i = 0; i < menuItems.length;i++) {

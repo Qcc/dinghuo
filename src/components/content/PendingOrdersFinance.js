@@ -113,10 +113,9 @@ class EditModalForm extends React.Component {
         <br />
         <FormItem>
         <div style={{textAlign:"center"}}>
-          <Button style={{width:"110px",marginRight:"10px"}} onClick={this.handleCancel}>取消</Button>
-          <Button type="dashed" style={{width:"110px",marginRight:"10px"}}
-                  onClick={()=>{this.props.form.resetFields()}}>重置</Button>
-          <Button type="primary" htmlType="submit"  style={{width:"110px"}}>重新提交</Button>          
+          <Button style={{width:"110px",marginRight:"40px"}} onClick={this.handleCancel}>取消</Button>
+           
+          <Button type="primary" htmlType="submit"  style={{width:"110px"}}>确认</Button>          
         </div>  
         </FormItem>
 

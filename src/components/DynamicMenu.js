@@ -41,22 +41,30 @@ class DynamicMenu extends React.Component {
      }
      //回调，将动态菜单映射到 state  
     menuUpdata=(data)=>{
-        if(!data){
-            return;
-        }    
-        this.props.PubSub.publish(this.props.Topics.Loading, false);
-         var groups = this.state.defaultOpenKeys;
-         var keys = this.state.defaultSelectedKeys;
-         if(data.entity.length > 0) {
-             //默认页面 
-             keys.push(data.entity[2].children[0].name);
-             groups.push(data.entity[2].name);
-         }
-        this.props.PubSub.publish(this.props.Topics.OnMenu, {menuKey:keys[0], menuItems:this.state.menuItems});
-         this.setState({
-                loading: false, 
-                menuItems: data.entity,
-            });
+        if(data === null){
+            Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+            return;    
+            };
+            if(data.errorCode !== 0){
+                Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+                return;
+            }
+            if(data.entity !== null){
+                //成功拿到数据  
+                this.props.PubSub.publish(this.props.Topics.Loading, false);
+                 var groups = this.state.defaultOpenKeys;
+                 var keys = this.state.defaultSelectedKeys;
+                 if(data.entity.length > 0) {
+                     //默认页面 
+                     keys.push(data.entity[2].children[0].name);
+                     groups.push(data.entity[2].name);
+                 }
+                this.props.PubSub.publish(this.props.Topics.OnMenu, {menuKey:keys[0], menuItems:this.state.menuItems});
+                 this.setState({
+                        loading: false, 
+                        menuItems: data.entity,
+                    });
+            }
     }
   
   //获取动态菜单
@@ -86,7 +94,6 @@ class DynamicMenu extends React.Component {
 
     
     render() {
-        console.dir("render ...");
         return (
             <Menu
             mode="inline"

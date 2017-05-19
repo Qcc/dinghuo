@@ -121,7 +121,6 @@ class DynamicContent extends React.Component {
     dynamicContent() {
         let menuItem =this.state.menuKey;
 
-        console.log("当前菜单 ",menuItem,"菜单类型 ",typeof this.state.menuKey);
         switch(menuItem){
             //销售模块
             case 'PartnerManager' :

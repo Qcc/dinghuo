@@ -31,7 +31,7 @@ class AddModalForm extends React.Component {
         this.props.componentDidMount();
         Modal.success({
               title: '成功',
-              content: '添加伙伴成功！伙伴登录地址为http://www.kouton.com,伙伴登录账户密码都是手机号,请登录后立即修改密码。',
+              content: '添加伙伴成功！,请登录后立即修改密码。',
         });
     }else{
         this.props.handleAddCancel();
@@ -66,12 +66,12 @@ class AddModalForm extends React.Component {
       <Form onSubmit={this.handleSubmit} >
 
          <FormItem {...formItemLayout} label="代理商级别" required>
-                {getFieldDecorator('level', {initialValue: 'ordinary',
+                {getFieldDecorator('level', {initialValue: '普通代理',
                      })(
                     <Select>
-                       <Option value="ordinary">普通代理</Option>
-                       <Option value="gold">金牌代理</Option>                       
-                       <Option value="isv">ISV合作</Option>
+                       <Option value="普通代理">普通代理</Option>
+                       <Option value="金牌代理">金牌代理</Option>                       
+                       <Option value="ISV合作">ISV合作</Option>
                      </Select>
                     )}
         </FormItem>
@@ -349,15 +349,7 @@ class PartnerManager extends React.Component {
         });
     }
     }
-    // //切换模块时，重新获取数据
-    // componentWillReceiveProps=(nextProps)=>{
-    //     console.log("接受了新的props",nextProps);
-    //     this.setState({
-    //         loading:true,
-    //     });
-    //     // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
-    //     fetch(nextProps.GetPager,this.callbackDate);
-    // }
+    
     //首次加载组件 获取数据
     componentDidMount=()=>{
         this.setState({

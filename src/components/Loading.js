@@ -21,7 +21,6 @@ class Loading extends React.Component {
 
     componentDidMount() {
         let cb = (topic, loading) => {
-            console.dir("process subscribe");
             this.setState({
                 loading: loading?(this.state.loading+1):(this.state.loading-1)
             });
@@ -34,7 +33,6 @@ class Loading extends React.Component {
     }
 
     render() {
-        console.dir(this.props);
 
         let display = (this.state.loading>0) ? 'block' : 'none';
         let style1 = {left:'0px', top:'0px', position:'fixed', width:'100%', height:'100%', display:display};

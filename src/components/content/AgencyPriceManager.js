@@ -54,7 +54,6 @@ class AgencyPriceManager extends React.Component {
         this.setState({
             editPrice:state,
         });
-        console.log("state ",this.state.editPrice.data)
     }
 
     handlePriceCancel=()=>{
@@ -162,17 +161,14 @@ class AgencyPriceManager extends React.Component {
                     "partner.id":this.state.editPrice.data.id,
                     "value":this.state.editPrice.data.value},"POST");
     }
-    console.log("value ",this.state.editPrice.data.value,"---","tempValue ",this.state.editPrice.data.tempValue);
   }
  
   onPriceChange=(value)=>{
-      console.log(value);
      let state = {...this.state.editPrice}
      state.data.value =  value;
      this.setState({
         editPrice:state,
      });
-     console.log(this.state.editPrice);
     }
     
     render() {

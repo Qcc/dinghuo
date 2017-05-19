@@ -72,15 +72,7 @@ class PartnerDetails extends React.Component {
         });
     }
     }
-    // //切换模块时，重新获取数据
-    // componentWillReceiveProps=(nextProps)=>{
-    //     console.log("接受了新的props",nextProps);
-    //     this.setState({
-    //         loading:true,
-    //     });
-    //     // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
-    //     fetch(nextProps.GetPager,this.callbackDate);
-    // }
+   
     //首次加载组件 获取数据
     componentDidMount=()=>{
         this.setState({
