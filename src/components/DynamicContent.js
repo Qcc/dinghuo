@@ -7,16 +7,18 @@ import LicenseManager from './content/LicenseManager'
 import PendingOrdersSales from './content/PendingOrdersSales'
 import OrderDetails from './content/OrderDetails'
 import PartnerManager from './content/PartnerManager';
+import PartnerManagerAdmin from './content/PartnerManagerAdmin';
 import CustomerManager from './content/CustomerManager';
-
 import AgencyPriceManager from './content/AgencyPriceManager';
-// import {orderCreate,orderUpdate,orderDelete,orderGetPager,
-//         partnerCreate,partnerUpdate,partnerDelete,partnerGetPager,} from '../utils/connect';
 //财务模块
-import PendingOrdersFinance from './content/PendingOrdersFinance'
-import HistoryOrders from './content/HistoryOrders'
-import AgencyPriceApproval from './content/AgencyPriceApproval'
-import PartnerDetails from './content/PartnerDetails'
+import PendingOrdersFinance from './content/PendingOrdersFinance';
+import HistoryOrders from './content/HistoryOrders';
+import AgencyPriceApproval from './content/AgencyPriceApproval';
+import PartnerDetails from './content/PartnerDetails';
+//管理员
+import EmployeeManager from './content/EmployeeManager';
+import ProductManager from './content/ProductManager';
+
 
 
 //账户信息
@@ -127,6 +129,8 @@ class DynamicContent extends React.Component {
             //销售模块
             case 'PartnerManager' :
                 return  <PartnerManager/>;
+            case 'PartnerManager_admin' :
+                return  <PartnerManagerAdmin/>;
             case 'AgencyPriceManager':
                 return  <AgencyPriceManager />;
             case 'StockQuery':
@@ -150,6 +154,11 @@ class DynamicContent extends React.Component {
                 return <PendingOrdersFinance/>;
             case 'PartnerDetails':
                 return <PartnerDetails/>;
+            //管理员
+            case 'EmployeeManager':
+                return <EmployeeManager/>;
+            case 'ProductManager':
+                return <ProductManager/>;
 
             case 'MyAccount':
                 return <AccountInfo/>;

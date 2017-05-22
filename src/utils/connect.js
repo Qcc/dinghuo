@@ -43,9 +43,9 @@ export function fetch(url,onComplete,params = {},method='POST'){
 
 //特殊操作
 export function fetch2(url,onComplete,params = {},method='POST'){
-    // console.log("调用了fecth =",'url',url,'method',method,'params:', params);
+    console.log("调用了fecth =",'url',url,'method',method,'params:', params);
     if(typeof onComplete !== 'function'){
-        // console.log("成功获取到数据,回调函数不正确",onComplete);
+        //console.log("成功获取到数据,回调函数不正确",onComplete);
         return;
     }
     reqwest({
@@ -59,7 +59,7 @@ export function fetch2(url,onComplete,params = {},method='POST'){
     })
      .then((data) => {
         if(data.status === 200){
-            // console.log("成功获取到数据 ",JSON.stringify(data,null,4));
+            console.log("成功获取到数据 ",JSON.stringify(data,null,4));
             onComplete(data);
         }else{
             onComplete(null);          
@@ -109,17 +109,34 @@ export const priceApproval = ROOTURL + "/protected/agencyprice/approval.api";
 
 //库存查询
 export const queryStockGetPager = ROOTURL + "/protected/stock/getPager.api";
-
 //产品查询
-export const productGetPager = ROOTURL + "/protected/partner/getPager.api";
+export const productGetPager = ROOTURL + "/protected/product/getPager.api";
+export const productCreate = ROOTURL + "/protected/product/create.api";
+export const productUpdate = ROOTURL + "/protected/product/update.api";
+export const productDelete = ROOTURL + "/protected/product/delete.api";
 
 //临时授权
 export const generateTrail = ROOTURL +"/protected/license/generateTrail.api";
 //临时license 延期 加点
 export const addUserNumberAndDelay = ROOTURL+"/protected/license/addUserNumberAndDelay.api";
-
 //临时license 获取还可延期的天数
 export const getSumDelayDays = ROOTURL+"/protected/license/getSumDelayDays.api";
+
+//员工管理
+export const employeeCreate = ROOTURL+"/protected/employee/create.api";
+export const employeeUpdate = ROOTURL+"/protected/employee/update.api";
+export const employeeDisable = ROOTURL+"/protected/employee/disable.api";
+export const employeeGetPager = ROOTURL+"/protected/employee/getPager.api";
+//部门管理
+export const departmentGetPager = ROOTURL+"/protected/department/getPager.api";
+
+
+
+
+
+
+
+
 
 //================mock data=================
 //财务

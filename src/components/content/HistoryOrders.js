@@ -78,7 +78,7 @@ class HistoryOrders extends React.Component{
                     "productName":tempArray[i].product && tempArray[i].product.productName,
                     "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
                     "points":tempArray[i].points,
-                    "sum":tempArray[i].sum,
+                    "money":tempArray[i].money,
                     "state":tempArray[i].state,  
                     "stateName":this.stateName(tempArray[i].state),                                              
                     "sales":tempArray[i].user && tempArray[i].user.name,
@@ -126,7 +126,7 @@ class HistoryOrders extends React.Component{
           dataIndex: 'points',
         }, {
           title: '金额',
-          dataIndex: 'sum',
+          dataIndex: 'money',
         }, {
           title: '状态',
           dataIndex: 'stateName',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table,Icon,Button,Modal,Form,Input,Select,Popconfirm } from 'antd';
-import {fetch,fetch2,partnerCreate,partnerUpdate,partnerdisable,partnerGetPager,employeeGetPager} from '../../utils/connect';
+import {fetch,employeeCreate,employeeUpdate,employeeDisable,employeeGetPager} from '../../utils/connect';
 
 const formItemLayout = {
   labelCol: {
@@ -56,7 +56,7 @@ class AddModalForm extends React.Component {
     });
     this.props.form.validateFields((err, values) => {
       if (!err) {
-          fetch(partnerCreate,this.onComplate,values,"POST");
+          fetch(employeeCreate,this.onComplate,values,"POST");
       }
     });
   }
@@ -157,7 +157,7 @@ class EditModalForm extends React.Component {
         this.props.componentDidMount();
         Modal.success({
               title: '成功',
-              content: '编辑伙伴成功！',
+              content: '编辑员工成功！',
         });
   }
    
@@ -407,7 +407,7 @@ class PartnerManager extends React.Component {
         // 真实api加 参数查询分页 {pageNO:pager.current,size:pager.pageSize,ifGetCount:1}
         fetch(partnerGetPager,this.callbackDate);
     }
-    //处理伙伴等级
+    //处理员工等级
     partnerLevel=(level)=>{
       let s ='';
       switch(level){
@@ -420,7 +420,7 @@ class PartnerManager extends React.Component {
       }
       return s;
     }
-     //处理伙伴状态
+     //处理员工状态
     partnerState=(state)=>{
       let s ='';
       switch(state){
@@ -457,16 +457,14 @@ class PartnerManager extends React.Component {
             sourceData.push({ 
                 "serial":i+1,
                 "id":tempArray[i].id,
-                "name":tempArray[i].name,
-                "address":tempArray[i].address,
-                "company":tempArray[i].company,
-                "level":this.partnerLevel(tempArray[i].level),
-                "email":tempArray[i].email,
-                "stateName":this.partnerState(tempArray[i].state),
-                "state":tempArray[i].state,                
-                "phone":tempArray[i].phone,                
-                "salesUser":tempArray[i].salesUser && tempArray[i].salesUser.employee &&
-                        tempArray[i].salesUser.employee.name,
+                "user":tempArray[i].user,
+                "password":tempArray[i].password,
+                "disable":tempArray[i].disable,
+                "employeeId":tempArray[i].employee && tempArray[i].employee,
+                "name":tempArray[i].employee && tempArray[i].employee.name,
+                "phone":tempArray[i].employee && tempArray[i].employee.phone,
+                "email":tempArray[i].employee && tempArray[i].employee.email,
+                "dp":tempArray[i].employee && tempArray[i].employee.dp && tempArray[i].employee.dp.name,
             });
         }
         this.setState({
@@ -480,9 +478,9 @@ class PartnerManager extends React.Component {
     //首次加载组件 获取数据
     componentDidMount=()=>{
         // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
-        fetch(partnerGetPager,this.callbackDate);
+        fetch(employeeGetPager,this.callbackDate,{pageNO:1,pageSize:10,ifGetCount:1})
     }
-    //新建伙伴
+    //新建员工
     createNewItem=()=>{
         let state = {...this.state.addModal};
             state.visibleAdd=true;
@@ -511,13 +509,7 @@ class PartnerManager extends React.Component {
             editModal:state,
         });
     }
-    // handleEditOk=()=>{
-    //     let state = {...this.state.editModal};
-    //         state.loadingEdit=true;
-    //     this.setState({
-    //         editModal:state,
-    //     });
-    // }
+  
     handleEditCancel=()=>{
         let state = {...this.state.editModal};
             state.visibleEdit=false;
@@ -527,17 +519,8 @@ class PartnerManager extends React.Component {
         });
     }    
 
-     //删除表格行
-    enableRow=(record)=>{
-        let state = {...this.state.deleteModal};
-            state.visibleDelete=true;
-            //深拷屏
-            Object.assign(state.data,record);
-        this.setState({
-            deleteModal:state,
-        });
-    }
-    //启用禁用伙伴行回调
+ 
+    //启用禁用员工行回调
     enableDisableUpdate=(data)=>{
       if(data === null){
         Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
@@ -555,23 +538,23 @@ class PartnerManager extends React.Component {
                   content: '当前操作成功！',
                 });
     }
-    //禁用伙伴     
+    //禁用员工     
     disableOk=(record)=>{
       fetch(partnerdisable,this.enableDisableUpdate,{"partnerId":record.id,"state":1});
     }     
-    //启用伙伴   
+    //启用员工   
     enableOk=(record)=>{
       fetch(partnerdisable,this.enableDisableUpdate,{"partnerId":record.id,"state":0});      
     }
-    //删除伙伴
+    //删除员工
     deleteOk=(record)=>{
       fetch(partnerdisable,this.enableDisableUpdate,{"partnerId":record.id,"state":2});      
     }
-    //恢复伙伴
+    //恢复员工
     unDeleteRow=(record)=>{
       fetch(partnerdisable,this.enableDisableUpdate,{"partnerId":record.id,"state":0});      
     }
-    //根据伙伴当前状态操作伙伴
+    //根据员工当前状态操作员工
     handleTable=(record)=>{
       if(record.state === 0){
         return(
@@ -623,26 +606,23 @@ class PartnerManager extends React.Component {
           title: '序号',
           dataIndex: 'serial',
         }, {
-          title: '公司名称',
-          dataIndex: 'company',
+          title: '登录账户',
+          dataIndex: 'user',
         },{
-          title: '联系人',
+          title: '员工',
           dataIndex: 'name',
         },  {
+          title: '所属部门',
+          dataIndex: 'dp',
+        }, {
           title: '电话',
           dataIndex: 'phone',
         }, {
           title: '邮箱',
           dataIndex: 'email',
         }, {
-          title: '代理商级别',
-          dataIndex: 'level',
-        }, {
           title: '状态',
-          dataIndex: 'stateName',
-        }, {
-          title: '销售代表',
-          dataIndex: 'salesUser',
+          dataIndex: 'disable',
         },{
           title: '操作',
           dataIndex: 'edit',
@@ -656,8 +636,8 @@ class PartnerManager extends React.Component {
         return (
             <div>
                 <div style={{position:'relative',marginBottom:"5px"}}>
-                <h2 style={{display:'inline-block'}}>伙伴管理</h2>
-                <Button type="primary" onClick={this.createNewItem} style={{position:"absolute",right:0}}>新建伙伴</Button>
+                <h2 style={{display:'inline-block'}}>员工管理</h2>
+                <Button type="primary" onClick={this.createNewItem} style={{position:"absolute",right:0}}>新建员工</Button>
                 </div>
             <Table bordered columns={Columns}
                 rowKey={record => record.serial}          //Table.rowKey：表格行 key 的取值，可以是字符串或一个函数 （我的理解：给每一行一个唯一标识）
@@ -669,7 +649,7 @@ class PartnerManager extends React.Component {
 
              <Modal
               visible={this.state.addModal.visibleAdd}
-              title="新建伙伴"
+              title="新建员工"
               //onOk={this.handleAddOk}
               onCancel={this.handleAddCancel}
               footer={null}>
@@ -680,7 +660,7 @@ class PartnerManager extends React.Component {
 
             <Modal
               visible={this.state.editModal.visibleEdit}
-              title="修改伙伴"
+              title="修改员工"
               //onOk={this.handleEditOk}
               onCancel={this.handleEditCancel}
               footer={null}

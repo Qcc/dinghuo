@@ -172,16 +172,16 @@ class PartnerManager extends React.Component {
     partnerLevel=(level)=>{
       let s ='';
       switch(level){
-        case "ordinary":s="普通代理";
+        case "普通代理":s="普通代理";
           break; 
-        case "gold": s="金牌代理";                      
+        case "金牌代理": s="金牌代理";                      
           break;
-        case "isv":s="ISV合作";
+        case "ISV合作":s="ISV合作";
           break;
       }
       return s;
     }
-
+ 
     //获取数据后映射到 table state
     callbackDate = (data) => {
        this.setState({
@@ -202,7 +202,7 @@ class PartnerManager extends React.Component {
         let tempArray = data.entity.list;
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
-          if(tempArray[i].state === 1) continue;
+          if(tempArray[i].state === 2) continue;
             sourceData.push({ 
                 "serial":i+1,
                 "id":tempArray[i].id,
@@ -212,8 +212,8 @@ class PartnerManager extends React.Component {
                 "level":this.partnerLevel(tempArray[i].level),
                 "email":tempArray[i].email,
                 "phone":tempArray[i].phone,   
-                "statusName":tempArray[i].state?"已禁用":"正常",
-                "status":tempArray[i].state,                                             
+                "stateName":tempArray[i].state?"禁用":"正常",
+                "state":tempArray[i].state,                                             
                 "user":tempArray[i].salesUser && tempArray[i].salesUser.employee &&
                         tempArray[i].salesUser.employee.name,
             });
@@ -263,14 +263,14 @@ class PartnerManager extends React.Component {
     //禁用启用
     handleEnableOk=(record)=>{
       console.log("确定",record);      
-      record.status= record.status === 2?0:2;
-        fetch(partnerdisable,this.parnterUpdate,{"partnerId":record.id,"state":record.status},"POST");
+      record.state= record.state === 1?0:1;
+        fetch(partnerdisable,this.parnterUpdate,{"partnerId":record.id,"state":record.state},"POST");
     }
     editTable=(record)=>{
-      return <Popconfirm title={record.status === 1?"您确定要该启用代理商吗?":"您确定要该禁用代理商吗?"} 
+      return <Popconfirm title={record.state === 1?"您确定要该启用代理商吗?":"您确定要该禁用代理商吗?"} 
                 onConfirm={()=>this.handleEnableOk(record)} 
                 okText="确认" cancelText="取消">
-                <a>{record.status===2?"启用":"禁用"}</a>
+                <a>{record.state===1?"启用":"禁用"}</a>
               </Popconfirm>;
     }
 
@@ -297,8 +297,8 @@ class PartnerManager extends React.Component {
           title: '代理商级别',
           dataIndex: 'level',
         }, {
-          title: '状态',
-          dataIndex: 'statusName',
+          title: '合作状态',
+          dataIndex: 'stateName',
         }, {
           title: '销售代表',
           dataIndex: 'user',
