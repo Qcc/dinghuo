@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table,Icon,Button,Modal,Form,Input,Select,Popconfirm,Tooltip} from 'antd';
-import {fetch,fetch2,customerCreate,customerUpdate,customerDelete,customerGetPager} from '../../utils/connect';
+import {fetch,fetch2,serviceCreate,serviceUpdate,serviceDelete,serviceGetPager} from '../../utils/connect';
 
 const formItemLayout = {
   labelCol: {
@@ -25,23 +25,22 @@ class AddModalForm extends React.Component {
     this.setState({
       loading:false,
     });
-    this.props.form.resetFields();
-    if(data === null){
-      Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
-      return;    
-      };
-      if(data.errorCode !== 0){
-          Modal.error({title: '错误！',content:'服务器错误,'+data.message});
-          return;
-      }
+    if(data){
         //表格重新加载数据
         this.props.handleAddCancel();
         this.props.componentDidMount();
         Modal.success({
               title: '成功',
-              content: '添加客户成功。',
+              content: '添加伙伴成功！,请登录后立即修改密码。',
         });
-    
+    }else{
+        this.props.handleAddCancel();
+        Modal.error({
+              title: '错误',
+              content: '服务器错误，伙伴添加失败，请稍后重试！',
+            });
+    }
+    this.props.form.resetFields();
   }
  
   //取消添加 并重置表单
@@ -52,13 +51,12 @@ class AddModalForm extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
+    this.setState({
+      loading:true,
+    });
     this.props.form.validateFields((err, values) => {
       if (!err) {
-          this.setState({
-            loading:true,
-          });
-          values.direct = 1;
-          fetch(customerCreate,this.onComplate,values);
+          fetch(partnerCreate,this.onComplate,values,"POST");
       }
     });
   }
@@ -67,45 +65,55 @@ class AddModalForm extends React.Component {
     return (
       <Form onSubmit={this.handleSubmit} >
 
-         
+         <FormItem {...formItemLayout} label="代理商级别" required>
+                {getFieldDecorator('level', {initialValue: '普通代理',
+                     })(
+                    <Select>
+                       <Option value="普通代理">普通代理</Option>
+                       <Option value="金牌代理">金牌代理</Option>                       
+                       <Option value="ISV合作">ISV合作</Option>
+                     </Select>
+                    )}
+        </FormItem>
+
         <FormItem {...formItemLayout} label="公司名称" >
           {getFieldDecorator('company', {
-            rules: [{ required: true, message: '请输入客户公司名称!' }],
+            rules: [{ required: true, message: '请输入代理商公司名称!' }],
           })(
-            <Input type="text" placeholder="请输入客户公司名称" />
+            <Input type="text" placeholder="请输入代理商公司名称" />
           )}
         </FormItem>
 
         <FormItem {...formItemLayout} label="联系人" >
           {getFieldDecorator('name', {
-            rules: [{ required: true, message: '请输入客户联系人姓名!' }],
+            rules: [{ required: true, message: '请输入代理商联系人姓名!' }],
           })(
-            <Input type="text" placeholder="请输入客户联系人" />
+            <Input type="text" placeholder="请输入代理商联系人" />
           )}
         </FormItem>
 
         <FormItem {...formItemLayout} label="电话" >
           {getFieldDecorator('phone', {
-            rules: [{ required: true, message: '请输入客户联系人电话!' }],
+            rules: [{ required: true, message: '请输入代理商联系人电话!' }],
           })(
-            <Input type="phone" placeholder="请输入客户电话" />
+            <Input type="phone" placeholder="请输入代理商电话" />
           )}
         </FormItem>
 
         <FormItem {...formItemLayout} label="邮箱" >
           {getFieldDecorator('email', {
-            rules: [{ required: true, message: '请输入客户邮箱地址!' },
+            rules: [{ required: true, message: '请输入代理商邮箱地址!' },
              {type:"email",message:"输入的邮箱不正确!"}],
           })(
-            <Input type="mail" placeholder="请输入客户邮箱" />
+            <Input type="mail" placeholder="请输入代理商邮箱" />
           )}
         </FormItem>
 
         <FormItem {...formItemLayout} label="地址" >
           {getFieldDecorator('address', {
-            rules: [{ required: true, message: '请输入客户地址!' }],
+            rules: [{ required: true, message: '请输入代理商地址!' }],
           })(
-            <Input type="text" placeholder="请输入客户地址" />
+            <Input type="text" placeholder="请输入代理商地址" />
           )}
         </FormItem>
         <br />
@@ -125,7 +133,7 @@ class AddModalForm extends React.Component {
 
 
 const WrapAddModalForm = Form.create()(AddModalForm);
-class CustomerManager extends React.Component {
+class ServiceChargeManager extends React.Component {
     constructor(props) { super(props); }
 
     state = {
@@ -158,10 +166,22 @@ class CustomerManager extends React.Component {
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:pager.current,size:pager.pageSize,ifGetCount:1}
-        fetch(partnerGetPager,this.callbackDate,{pageNO:pager.current,size:pager.pageSize,ifGetCount:1});
+        fetch(partnerGetPager,this.callbackDate);
     }
-   
-
+    //处理伙伴等级
+    partnerLevel=(level)=>{
+      let s ='';
+      switch(level){
+        case "普通代理":s="普通代理";
+          break; 
+        case "金牌代理": s="金牌代理";                      
+          break;
+        case "ISV合作":s="ISV合作";
+          break;
+      }
+      return s;
+    }
+ 
     //获取数据后映射到 table state
     callbackDate = (data) => {
        this.setState({
@@ -182,18 +202,19 @@ class CustomerManager extends React.Component {
         let tempArray = data.entity.list;
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
+          if(tempArray[i].state === 2) continue;
             sourceData.push({ 
                 "serial":i+1,
                 "id":tempArray[i].id,
-                "name":tempArray[i].name,
+                "company":tempArray[i].customer && tempArray[i].customer.company,
+                "name":tempArray[i].customer && tempArray[i].customer.name,
+                "phone":tempArray[i].customer && tempArray[i].customer.phone,   
                 "address":tempArray[i].address,
-                "company":tempArray[i].company,
-                "email":tempArray[i].email,
-                "phone":tempArray[i].phone,   
-                "directName":tempArray[i].direct === 1?"直销客户":"渠道",
-                "direct":tempArray[i].direct,                
-                "partner":tempArray[i].partner && tempArray[i].partner.company,                                             
-                "salesuser":tempArray[i].salesUser && tempArray[i].salesUser.employee &&
+                "email":tempArray[i].email,                
+                "license":tempArray[i].license,
+                "datetime":tempArray[i].datetime,
+                "serviceExpirationDate":tempArray[i].serviceExpirationDate,                
+                "salesuser": tempArray[i].customer && tempArray[i].salesUser && tempArray[i].salesUser.employee &&
                         tempArray[i].salesUser.employee.name,
             });
         }
@@ -208,7 +229,7 @@ class CustomerManager extends React.Component {
     //首次加载组件 获取数据
     componentDidMount=()=>{
         // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
-        fetch(customerGetPager,this.callbackDate,{pageNO:1,size:10,ifGetCount:1});
+        fetch(serviceGetPager,this.callbackDate,{pageNO:1,size:10,ifGetCount:1});
     }
     //新建伙伴
     createNewItem=()=>{
@@ -227,7 +248,34 @@ class CustomerManager extends React.Component {
         });
     }
 
-    
+    parnterUpdate=(data)=>{
+      if(data === null){
+          Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+          return;    
+          };
+          if(data.errorCode !== 0){
+              Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+              return;
+          }
+          Modal.success({title: '成功',content:'操作成功'});
+          this.componentDidMount();
+    }
+    //禁用启用
+    handleEnableOk=(record)=>{
+      console.log("确定",record);      
+      record.state= record.state === 1?0:1;
+        fetch(partnerdisable,this.parnterUpdate,{"partnerId":record.id,"state":record.state},"POST");
+    }
+    editTable=(record)=>{
+      return <Popconfirm title={record.state === 1?"您确定要该启用代理商吗?":"您确定要该禁用代理商吗?"} 
+                onConfirm={()=>this.handleEnableOk(record)} 
+                okText="确认" cancelText="取消">
+                <a>{record.state===1?"启用":"禁用"}</a>
+              </Popconfirm>;
+    }
+
+
+
     render() {
          //伙伴表 字段
         const Columns = [{
@@ -246,22 +294,34 @@ class CustomerManager extends React.Component {
           title: '邮箱',
           dataIndex: 'email',
         }, {
-          title: '销售渠道',
-          dataIndex: 'directName',
+          title: '授权码',
+          dataIndex: 'license',
         }, {
-          title: '代理商',
-          dataIndex: 'partner',
+          title: '缴费日期',
+          dataIndex: 'datetime',
         }, {
-          title: '销售代表',
+          title: '服务截止',
+          dataIndex: 'serviceExpirationDate',
+        }, {
+          title: '负责人',
           dataIndex: 'salesuser',
+        },{
+          title: <Tooltip placement="left" title='禁用后代理商将不能再登录伙伴系统'>操作</Tooltip>,
+          dataIndex: 'edit',
+          render: (text, record, index) => {
+                  return (
+                      <div>
+                        {this.editTable(record)}
+                    </div> 
+                  );
+              }, 
         }];
 
         return (
             <div>
                 <div style={{position:'relative',marginBottom:"5px"}}>
-                <h2 style={{display:'inline-block'}}>终端客户管理</h2>
-                <Button type="primary" onClick={this.createNewItem} style={{position:"absolute",right:0}}>新建客户</Button>
-                </div>
+                <h2 style={{display:'inline-block'}}>售后服务管理</h2>
+            </div>
             <Table bordered columns={Columns}
                 rowKey={record => record.serial}          //Table.rowKey：表格行 key 的取值，可以是字符串或一个函数 （我的理解：给每一行一个唯一标识）
                 dataSource={this.state.data}
@@ -272,7 +332,7 @@ class CustomerManager extends React.Component {
 
              <Modal
               visible={this.state.addModal.visibleAdd}
-              title="新建客户"
+              title="新建伙伴"
               //onOk={this.handleAddOk}
               onCancel={this.handleAddCancel}
               footer={null}>
@@ -286,4 +346,4 @@ class CustomerManager extends React.Component {
 }
 
 //导出组件
-export default CustomerManager;
+export default ServiceChargeManager;

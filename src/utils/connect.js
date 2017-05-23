@@ -130,7 +130,17 @@ export const employeeGetPager = ROOTURL+"/protected/employee/getPager.api";
 //部门管理
 export const departmentGetPager = ROOTURL+"/protected/department/getPager.api";
 
+//终端用户管理
+export const customerCreate = ROOTURL + "/protected/customer/create.api";
+export const customerUpdate = ROOTURL + "/protected/customer/update.api";
+export const customerDelete = ROOTURL + "/protected/customer/delete.api";
+export const customerGetPager = ROOTURL + "/protected/customer/getPager.api";
 
+//维护费管理
+export const serviceCreate = ROOTURL + "/protected/customerservicecharge/create.api";
+export const serviceUpdate = ROOTURL + "/protected/customerservicecharge/update.api";
+export const serviceDelete = ROOTURL + "/protected/customerservicecharge/delete.api";
+export const serviceGetPager = ROOTURL + "/protected/customerservicecharge/getPager.api";
 
 
 

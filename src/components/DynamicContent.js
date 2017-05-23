@@ -3,13 +3,16 @@ import { Table,Calendar,Button } from 'antd';
 //销售模块
 import StockManager from './content/StockManager'
 import CreateOrder from './content/CreateOrder'
-import LicenseManager from './content/LicenseManager'
+import FormalLicenseManager from './content/FormalLicenseManager'
 import PendingOrdersSales from './content/PendingOrdersSales'
 import OrderDetails from './content/OrderDetails'
 import PartnerManager from './content/PartnerManager';
 import PartnerManagerAdmin from './content/PartnerManagerAdmin';
 import CustomerManager from './content/CustomerManager';
 import AgencyPriceManager from './content/AgencyPriceManager';
+import TrailLicenseManager from './content/TrailLicenseManager';
+import ServiceChargeManager from './content/ServiceChargeManager';
+
 //财务模块
 import PendingOrdersFinance from './content/PendingOrdersFinance';
 import HistoryOrders from './content/HistoryOrders';
@@ -141,10 +144,13 @@ class DynamicContent extends React.Component {
                 return <PendingOrdersSales/>;
             case 'OrderDetails':
                 return <OrderDetails/>; 
-            case 'LicenseManager':
-                return <LicenseManager/>; 
+            case 'FormalLicenseManager':
+                return <FormalLicenseManager/>; 
             case 'CustomerManager':
                 return <CustomerManager/>; 
+            case 'ServiceChargeManager':
+                return <ServiceChargeManager/>;
+                
             //财务模块  
             case 'AgencyPriceApproval':
                 return <AgencyPriceApproval/>;
@@ -154,6 +160,8 @@ class DynamicContent extends React.Component {
                 return <PendingOrdersFinance/>;
             case 'PartnerDetails':
                 return <PartnerDetails/>;
+            case 'TrailLicenseManager':
+                return <TrailLicenseManager/>;
             //管理员
             case 'EmployeeManager':
                 return <EmployeeManager/>;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table,Icon,Button,Modal,Form,Input,Select,Popconfirm } from 'antd';
-import {fetch,employeeCreate,employeeUpdate,employeeDisable,employeeGetPager} from '../../utils/connect';
+import {fetch,fetch2,employeeCreate,employeeUpdate,employeeDisable,employeeGetPager,departmentGetPager} from '../../utils/connect';
 
 const formItemLayout = {
   labelCol: {
@@ -14,32 +14,57 @@ const formItemLayout = {
 };
 const FormItem = Form.Item;
 const Option = Select.Option;
-
+const children=[];
 
 class AddModalForm extends React.Component {
   state={
       loading:false,
   }
+
+
+  dpUpdata=(data)=>{
+            if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    if(data.entity !== null){
+        //成功拿到数据
+            let list = data.entity;
+            for (let i = 0; i < list.length; i++) {
+                children.push(<Option key={list[i].id}>{list[i].name}</Option>);
+            }
+        }
+        
+    }
+    componentDidMount=()=>{
+        fetch(departmentGetPager,this.dpUpdata,{pageNO:1,pageSize:1000,ifGetCount:1})
+    }
+
+
     //添加成功数据后的回调
   onComplate=(data)=>{
     this.setState({
       loading:false,
     });
-    if(data){
+    if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
         //表格重新加载数据
         this.props.handleAddCancel();
         this.props.componentDidMount();
         Modal.success({
               title: '成功',
-              content: '添加伙伴成功！,请登录后立即修改密码。',
+              content: '添加员工成功！,请登录后立即修改密码。',
         });
-    }else{
-        this.props.handleAddCancel();
-        Modal.error({
-              title: '错误',
-              content: '服务器错误，伙伴添加失败，请稍后重试！',
-            });
-    }
     this.props.form.resetFields();
   }
  
@@ -56,7 +81,9 @@ class AddModalForm extends React.Component {
     });
     this.props.form.validateFields((err, values) => {
       if (!err) {
-          fetch(employeeCreate,this.onComplate,values,"POST");
+        fetch(employeeCreate,this.onComplate,
+            {"employee.name":values.name,"user":values.user,"password":values.user,"employee.dp.id":values.dp,
+                "employee.phone":values.phone,"employee.email":values.email});
       }
     });
   }
@@ -65,58 +92,57 @@ class AddModalForm extends React.Component {
     return (
       <Form onSubmit={this.handleSubmit} >
 
-         <FormItem {...formItemLayout} label="代理商级别" required>
-                {getFieldDecorator('level', {initialValue: '普通代理',
-                     })(
-                    <Select>
-                       <Option value="普通代理">普通代理</Option>
-                       <Option value="金牌代理">金牌代理</Option>                       
-                       <Option value="ISV合作">ISV合作</Option>
+        <FormItem {...formItemLayout} label="员工姓名" >
+          {getFieldDecorator('name', {
+            rules: [{ required: true, message: '请输入员工姓名!' }],
+          })(
+            <Input type="text" placeholder="请输入员工姓名" />
+          )}
+        </FormItem>
+
+        <FormItem {...formItemLayout} label="登录帐号" >
+          {getFieldDecorator('user', {
+            rules: [{ required: true, message: '请输入登录帐号!' }],
+          })(
+            <Input type="text" placeholder="请输入登录帐号" />
+          )}
+        </FormItem>
+
+         <FormItem {...formItemLayout} label="所属部门" required>
+                {getFieldDecorator('dp',{
+            rules: [{ required: true, message: '请输请选择部门!' }],
+          })(
+                    <Select
+                       showSearch
+                       onChange={this.dpOnChange}
+                       style={{ width: 200 }}
+                       style={{ width: '100%' }}
+                       filterOption={(value, option) => option.props.children.indexOf(value)!=-1}
+                     >
+                       {children}
                      </Select>
                     )}
         </FormItem>
 
-        <FormItem {...formItemLayout} label="公司名称" >
-          {getFieldDecorator('company', {
-            rules: [{ required: true, message: '请输入代理商公司名称!' }],
-          })(
-            <Input type="text" placeholder="请输入代理商公司名称" />
-          )}
-        </FormItem>
-
-        <FormItem {...formItemLayout} label="联系人" >
-          {getFieldDecorator('name', {
-            rules: [{ required: true, message: '请输入代理商联系人姓名!' }],
-          })(
-            <Input type="text" placeholder="请输入代理商联系人" />
-          )}
-        </FormItem>
-
         <FormItem {...formItemLayout} label="电话" >
           {getFieldDecorator('phone', {
-            rules: [{ required: true, message: '请输入代理商联系人电话!' }],
+            rules: [{ required: true, message: '请输入员工电话!' }],
           })(
-            <Input type="phone" placeholder="请输入代理商电话" />
+            <Input type="text" placeholder="请输入员工电话" />
           )}
         </FormItem>
 
         <FormItem {...formItemLayout} label="邮箱" >
           {getFieldDecorator('email', {
-            rules: [{ required: true, message: '请输入代理商邮箱地址!' },
-             {type:"email",message:"输入的邮箱不正确!"}],
+            rules: [{ required: true, message: '请输入员工邮箱!' }],
           })(
-            <Input type="mail" placeholder="请输入代理商邮箱" />
+            <Input type="text" placeholder="请输入员工邮箱" />
           )}
         </FormItem>
-
-        <FormItem {...formItemLayout} label="地址" >
-          {getFieldDecorator('address', {
-            rules: [{ required: true, message: '请输入代理商地址!' }],
-          })(
-            <Input type="text" placeholder="请输入代理商地址" />
-          )}
-        </FormItem>
-        <br />
+     
+        <div style={{border: "1px #f50 dashed",padding: "5px",margin: "0 30px 20px"}}>
+            <p><span style={{color: "#f50"}}>提示 ：</span>新建帐号密码默认与帐号相同，请员工登录后立即修改密码。</p>
+        </div>
         <FormItem>
         <div style={{textAlign:"center"}}>
           <Button style={{width:"110px",marginRight:"10px"}} onClick={this.handleCancel}>取消</Button>
@@ -130,11 +156,12 @@ class AddModalForm extends React.Component {
     );
   }
 }
-const children=[];
+
 class EditModalForm extends React.Component {
 
   state={
     loading:false,
+    confirmDirty: false,//验证密码
     data:{},//要修改的数据
   }
     //确认编辑数据后的回调
@@ -165,6 +192,7 @@ class EditModalForm extends React.Component {
   handleCancel=()=>{
     this.setState({
         data:{},
+        "employee.name":null,
     });
     this.props.handleEditCancel();
     this.props.form.resetFields();
@@ -174,13 +202,39 @@ class EditModalForm extends React.Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         let data = this.state.data;
-        if(data.level || data.company || data.salesUser ||
-            data.name || data.phone || data.email || data.address){
-          let param = {
-            condition: {id:this.props.record.id},
-            entity: this.state.data
+        let params = {};
+        if(data.name)
+          if(params.employee){
+              params.employee.name=data.name;
+          }else{
+            params.employee={name:data.name};
           }
-          fetch2(partnerUpdate,this.onComplate,param);
+        if(data.user)params.user=data.user;
+        if(data.dp)
+          if(params.employee){
+            params.employee.dp={id:data.dp};
+          }else{
+            params.employee={dp:{id:data.dp}};            
+          }
+        if(data.phone)
+          if(params.employee){
+            params.employee.phone=data.phone;
+          }else{
+            params.employee={phone:data.phone};            
+          }
+        if(data.email)
+          if(params.employee){
+            params.employee.email = data.email;
+          }else{
+            params.employee = {email:data.email};            
+          }
+        if(data.password)params.password = data.password;
+        if(params.employee || params.user || params.password){
+          let param = {
+            condition: {employee:{id:this.props.record.employeeId}},
+            entity: params
+          }
+          fetch2(employeeUpdate,this.onComplate,param);
           this.setState({
             loading:true,
           });
@@ -204,57 +258,46 @@ class EditModalForm extends React.Component {
     }
     if(data.entity !== null){
         //成功拿到数据
-            let list = data.entity.list;
-            for (let i = 0; i < data.entity.count; i++) {
-              if(list[i].dp && list[i].dp.id === 3){
+            let list = data.entity;
+            for (let i = 0; i < list.length; i++) {
                 children.push(<Option key={list[i].id}>{list[i].name}</Option>);
-              }
             }
         }
-        console.log(children); 
+        
     }
     componentDidMount=()=>{
-        fetch(employeeGetPager,this.employeeListUpdata,{pageNO:1,pageSize:1000,ifGetCount:1})
+        fetch(departmentGetPager,this.employeeListUpdata,{pageNO:1,pageSize:1000,ifGetCount:1})
     }
 
-  levelOnChange=(value)=>{
-    let tempData = {}
-    Object.assign(tempData,this.state.data);
-    tempData.level = value;
-    this.setState({
-      data:tempData
-    });
-  }
-  companyOnChange=(e)=>{
-    let tempData = {}
-    Object.assign(tempData,this.state.data);
-    tempData.company = e.target.value;
-    this.setState({
-      data:tempData
-    });
-  }
-  salesUserOnChange=(value)=>{
-    let tempData = {}
-    let salesUser = {};
-    Object.assign(tempData,this.state.data);
-    salesUser.id = value;
-    tempData.salesUser=salesUser;
-    this.setState({
-      data:tempData
-    });
-  }
   nameOnChange=(e)=>{
     let tempData = {}
     Object.assign(tempData,this.state.data);
-    tempData.name = e.target.value;
+    tempData.name =e.target.value;
     this.setState({
       data:tempData
     });
   }
+  userOnChange=(e)=>{
+    let tempData = {}
+    Object.assign(tempData,this.state.data);
+    tempData.user = e.target.value;
+    this.setState({
+      data:tempData
+    });
+  }
+  dpOnChange=(value)=>{
+    let tempData = {}
+    Object.assign(tempData,this.state.data);
+      tempData.dp=value;
+    this.setState({
+      data:tempData
+    });
+  }
+ 
   phoneOnChange=(e)=>{
     let tempData = {}
     Object.assign(tempData,this.state.data);
-    tempData.phone = e.target.value;
+    tempData.phone =e.target.value;      
     this.setState({
       data:tempData
     });
@@ -262,51 +305,77 @@ class EditModalForm extends React.Component {
   emailOnChange=(e)=>{
     let tempData = {}
     Object.assign(tempData,this.state.data);
-    tempData.email = e.target.value;
+    tempData.email =e.target.value;      
     this.setState({
       data:tempData
     });
   } 
-  addressOnChange=(e)=>{
+  passwordOnChange=(e)=>{
     let tempData = {}
     Object.assign(tempData,this.state.data);
-    tempData.address = e.target.value;
+    tempData.password = e.target.value;
     this.setState({
       data:tempData
     });
   }
+  rePasswordOnChange=(e)=>{
+    let tempData = {}
+    Object.assign(tempData,this.state.data);
+    tempData.rePassword = e.target.value;
+    this.setState({
+      data:tempData
+    });
+  }
+
+  handleConfirmBlur = (e) => {
+    const value = e.target.value;
+    this.setState({ confirmDirty: this.state.confirmDirty || !!value });
+  }
+  checkPassword = (rule, value, callback) => {
+    const form = this.props.form;
+    if (value && value !== form.getFieldValue('password')) {
+      callback('两次输入的密码不一致!');
+    } else {
+      callback();
+    }
+  }
+  checkConfirm = (rule, value, callback) => {
+    const form = this.props.form;
+    if (value && this.state.confirmDirty) {
+      form.validateFields(['rePassword'], { force: true });
+    }
+    callback();
+  }
+
 
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
       <Form onSubmit={this.handleSubmit} >
 
-         <FormItem {...formItemLayout} label="代理商级别" required>
-                {getFieldDecorator('level', {initialValue: '普通代理',
+         <FormItem {...formItemLayout} label="员工姓名" required>
+                {getFieldDecorator('level', {initialValue: this.props.record.name,
                      })(
-                    <Select onChange={this.levelOnChange}>
-                       <Option value="普通代理">普通代理</Option>
-                       <Option value="金牌代理">金牌代理</Option>                       
-                       <Option value="ISV合作">ISV合作</Option>
-                     </Select>
+            <Input type="text" onChange={this.nameOnChange} placeholder="请输入员工姓名" />
+                     
                     )}
         </FormItem>
 
-        <FormItem {...formItemLayout} label="公司名称" >
+        <FormItem {...formItemLayout} label="登录帐号" >
           {getFieldDecorator('company', {
-              initialValue: this.props.record.company,
-            rules: [{ required: true, message: '请输入代理商公司名称!' }],
+              initialValue: this.props.record.user,
+            rules: [{ required: true, message: '请输入员工登录帐号!' }],
           })(
-            <Input type="text" onChange={this.companyOnChange} placeholder="请输入代理商公司名称" />
+            <Input type="text" onChange={this.userOnChange} placeholder="请输入员工登录帐号!" />
           )}
         </FormItem>
 
-        <FormItem {...formItemLayout} label="销售代表" required>
-                {getFieldDecorator('salesUser', {initialValue: this.props.record.salesUser,
+        <FormItem {...formItemLayout} label="所属部门" required>
+                {getFieldDecorator('salesUser', {initialValue: this.props.record.dp,
                      })(
                     <Select
                        showSearch
-                       onChange={this.salesUserOnChange}
+                       onChange={this.dpOnChange}
                        style={{ width: 200 }}
                        style={{ width: '100%' }}
                        filterOption={(value, option) => option.props.children.indexOf(value)!=-1}
@@ -314,15 +383,6 @@ class EditModalForm extends React.Component {
                        {children}
                      </Select>
                     )}
-        </FormItem>
-
-        <FormItem {...formItemLayout} label="联系人" >
-          {getFieldDecorator('name', {
-              initialValue: this.props.record.name,
-            rules: [{ required: true, message: '请输入代理商联系人姓名!' }],
-          })(
-            <Input type="text" onChange={this.nameOnChange} placeholder="请输入代理商联系人" />
-          )}
         </FormItem>
 
         <FormItem {...formItemLayout} label="电话" >
@@ -344,14 +404,33 @@ class EditModalForm extends React.Component {
           )}
         </FormItem>
 
-        <FormItem {...formItemLayout} label="地址" >
-          {getFieldDecorator('address', {
-              initialValue: this.props.record.address,
-            rules: [{ required: true, message: '请输入代理商地址!' }],
+        <FormItem {...formItemLayout} label="密码" >
+          {getFieldDecorator('password', {
+              initialValue: this.props.record.password,            
+            rules: [{
+              required: true, message: '请输入员工帐号密码!',
+            }, {
+              validator: this.checkConfirm,
+            }],
           })(
-            <Input type="text" onChange={this.addressOnChange} placeholder="请输入代理商地址" />
+            <Input type="password" onChange={this.passwordOnChange} placeholder="请输入员工帐号密码" />
           )}
         </FormItem>
+
+        <FormItem {...formItemLayout} label="重复密码"  >
+          {getFieldDecorator('rePassword', {
+              initialValue: this.props.record.password,            
+            rules: [{
+              required: true, message: '请重复输入员工帐号密码!',
+            }, {
+              validator: this.checkPassword,
+            }],
+          })(
+            <Input type="password"  onChange={this.rePasswordOnChange} placeholder="请重复员工帐号密码" 
+                  onBlur={this.handleConfirmBlur} />
+          )}
+        </FormItem>
+
         <br />
         <FormItem>
         <div style={{textAlign:"center"}}>
@@ -369,7 +448,7 @@ class EditModalForm extends React.Component {
 
 const WrapAddModalForm = Form.create()(AddModalForm);
 const WrapEditModalForm = Form.create()(EditModalForm);
-class PartnerManager extends React.Component {
+class EmployeeManager extends React.Component {
     constructor(props) { super(props); }
 
     state = {
@@ -405,35 +484,9 @@ class PartnerManager extends React.Component {
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:pager.current,size:pager.pageSize,ifGetCount:1}
-        fetch(partnerGetPager,this.callbackDate);
+        fetch(employeeGetPager,this.callbackDate,{pageNO:pager.current,size:pager.pageSize,ifGetCount:1});
     }
-    //处理员工等级
-    partnerLevel=(level)=>{
-      let s ='';
-      switch(level){
-        case "普通代理":s="普通代理";
-          break; 
-        case "金牌代理": s="金牌代理";                      
-          break;
-        case "ISV合作":s="ISV合作";
-          break;
-      }
-      return s;
-    }
-     //处理员工状态
-    partnerState=(state)=>{
-      let s ='';
-      switch(state){
-        case 0:s="正常";
-          break; 
-        case 1: s="禁用";                      
-          break;
-        case 2:s="不再合作";
-          break;
-      }
-      return s;
-    }
-
+    
     //获取数据后映射到 table state
     callbackDate = (data) => {
        this.setState({
@@ -460,7 +513,8 @@ class PartnerManager extends React.Component {
                 "user":tempArray[i].user,
                 "password":tempArray[i].password,
                 "disable":tempArray[i].disable,
-                "employeeId":tempArray[i].employee && tempArray[i].employee,
+                "disableName":tempArray[i].disable?"已禁用":"正常",                
+                "employeeId":tempArray[i].employee && tempArray[i].employee.id,
                 "name":tempArray[i].employee && tempArray[i].employee.name,
                 "phone":tempArray[i].employee && tempArray[i].employee.phone,
                 "email":tempArray[i].employee && tempArray[i].employee.email,
@@ -540,65 +594,17 @@ class PartnerManager extends React.Component {
     }
     //禁用员工     
     disableOk=(record)=>{
-      fetch(partnerdisable,this.enableDisableUpdate,{"partnerId":record.id,"state":1});
-    }     
-    //启用员工   
-    enableOk=(record)=>{
-      fetch(partnerdisable,this.enableDisableUpdate,{"partnerId":record.id,"state":0});      
-    }
-    //删除员工
-    deleteOk=(record)=>{
-      fetch(partnerdisable,this.enableDisableUpdate,{"partnerId":record.id,"state":2});      
-    }
-    //恢复员工
-    unDeleteRow=(record)=>{
-      fetch(partnerdisable,this.enableDisableUpdate,{"partnerId":record.id,"state":0});      
-    }
-    //根据员工当前状态操作员工
-    handleTable=(record)=>{
-      if(record.state === 0){
-        return(
-          <div>
-            <a onClick={()=>this.editRow(record)}>编辑</a>{" | "}
-            <Popconfirm placement="left" title="您确定要禁用该代理商吗?禁用后该代理商将不能再登录伙伴系统。" 
-                onConfirm={()=>this.disableOk(record)} 
-                okText="确认" cancelText="取消">
-            <a>禁用</a>{" | "}
-            </Popconfirm>
-            <Popconfirm placement="left" title="您确定不再与代理商合作吗?确认后该伙伴将不能再登录系统,伙伴的客户将转为直销客户。" 
-                onConfirm={()=>this.deleteOk(record)} 
-                okText="确认" cancelText="取消">
-            <a>不再合作</a>
-            </Popconfirm>
-          </div>
-        );
-      }else if(record.state === 1){
-        return(
-          <div>
-            <a onClick={()=>this.editRow(record)}>编辑</a>{" | "}
-            <Popconfirm placement="left" title="您确定要启用该代理商吗?启用后该代理商可以正常登录伙伴系统。" 
-                onConfirm={()=>this.enableOk(record)} 
-                okText="确认" cancelText="取消">
-            <a>启用</a>{" | "}
-            </Popconfirm>
-            <Popconfirm placement="left" title="您确定不再与代理商合作吗?确认后该伙伴将不能再登录系统,伙伴的客户将转为直销客户。" 
-                onConfirm={()=>this.deleteOk(record)} 
-                okText="确认" cancelText="取消">
-            <a>不再合作</a>
-            </Popconfirm>
-          </div>
-        );
-      }else if(record.state === 2){
-        return(
-            <Popconfirm title="您确定要恢复代理商合作吗?确认后该伙伴可以正常登录系统,伙伴的客户将转为伙伴客户。" 
-                onConfirm={()=>this.unDeleteRow(record)} 
-                okText="确认" cancelText="取消">
-            <a>恢复合作</a>
-            </Popconfirm>
-        );
+      let disable=null;
+      if(record.disable === 1){
+        disable=0;
+      }else{
+        disable=1
       }
-
-    }
+      fetch(employeeDisable,this.enableDisableUpdate,{"userId":record.employeeId,"disable":disable});
+    }     
+    
+   
+    
 
     render() {
          //伙伴表 字段
@@ -609,7 +615,7 @@ class PartnerManager extends React.Component {
           title: '登录账户',
           dataIndex: 'user',
         },{
-          title: '员工',
+          title: '员工姓名',
           dataIndex: 'name',
         },  {
           title: '所属部门',
@@ -622,13 +628,20 @@ class PartnerManager extends React.Component {
           dataIndex: 'email',
         }, {
           title: '状态',
-          dataIndex: 'disable',
+          dataIndex: 'disableName',
         },{
           title: '操作',
           dataIndex: 'edit',
           render: (text, record, index) => {
                   return (
-                    this.handleTable(record) 
+                   <div>
+                     <a onClick={()=>this.editRow(record)}>编辑</a>{" | "}
+                     <Popconfirm placement="left" title={record.disable === 1?"您确定要启用该员工吗?":"您确定要禁用该员工吗?"} 
+                         onConfirm={()=>this.disableOk(record)} 
+                         okText="确认" cancelText="取消">
+                     <a>{record.disable === 1?"启用":"禁用"}</a>
+                     </Popconfirm>
+                   </div>
                   );
               }, 
         }];
@@ -675,4 +688,4 @@ class PartnerManager extends React.Component {
 }
 
 //导出组件
-export default PartnerManager;
+export default EmployeeManager;

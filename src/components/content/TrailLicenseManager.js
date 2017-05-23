@@ -819,7 +819,7 @@ class FilterTable extends React.Component {
 
 const WrappedAskTemlLic = Form.create()(AskTemlLic);
  
-class LicenseManager extends React.Component{
+class TrailLicenseManager extends React.Component{
     state={
       visible:false,
       loading:false,
@@ -841,7 +841,7 @@ class LicenseManager extends React.Component{
         return(
             <div>
                 <div style={{position: "relative",borderBottom: "1px solid #ccc",height: "32px",marginBottom: "10px"}}>
-                    <h2>临时授权</h2> 
+                    <h2>临时授权管理</h2> 
                     <Button style={{position: "absolute",right: "10px",bottom: "5px"}} onClick={this.showAskTemlLic} type="primary">申请临时授权</Button>
                 </div>
                 <FilterTable />
@@ -859,4 +859,4 @@ class LicenseManager extends React.Component{
     }
 }
 
-export default LicenseManager;
+export default TrailLicenseManager;

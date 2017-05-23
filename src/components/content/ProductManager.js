@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table,Icon,Button,Modal,Form,Input,Select,Popconfirm } from 'antd';
-import {fetch,productGetPager,productCreate,productUpdate,productDelete} from '../../utils/connect';
+import {fetch2,fetch,productGetPager,productCreate,productUpdate,productDelete} from '../../utils/connect';
 
 const formItemLayout = {
   labelCol: {
@@ -67,7 +67,6 @@ class AddModalForm extends React.Component {
 
         <FormItem {...formItemLayout} label="产品名称" >
           {getFieldDecorator('productName', {
-              initialValue: this.props.record.productName,
             rules: [{ required: true, message: '请输入产品名称!' }],
           })(
             <Input type="text" onChange={this.nameOnChange} placeholder="请输入产品名称!" />
@@ -76,7 +75,6 @@ class AddModalForm extends React.Component {
 
         <FormItem {...formItemLayout} label="产品版本" >
           {getFieldDecorator('productVersion', {
-              initialValue: this.props.record.productVersion,
             rules: [{ required: true, message: '请输入产品版本!' }],
           })(
             <Input type="phone" onChange={this.phoneOnChange} placeholder="请输入产品版本!" />
@@ -86,7 +84,6 @@ class AddModalForm extends React.Component {
 
         <FormItem {...formItemLayout} label="市场价" >
           {getFieldDecorator('productPrice', {
-              initialValue: this.props.record.productPrice,
             rules: [{ required: true, message: '请输入产品市场价!' }],
           })(
             <Input type="text" onChange={this.addressOnChange} placeholder="请输入产品市场价!" />
@@ -107,7 +104,7 @@ class AddModalForm extends React.Component {
     );
   }
 }
-const children=[];
+ 
 class EditModalForm extends React.Component {
 
   state={
@@ -151,9 +148,10 @@ class EditModalForm extends React.Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         let data = this.state.data;
+        console.log(data);
         if(data.productPrice || data.productName || data.productVersion){
           let param = {
-            condition: {id:this.props.record.productId},
+            condition: {productId:this.props.record.productId},
             entity: this.state.data
           }
           fetch2(productUpdate,this.onComplate,param);
@@ -168,31 +166,6 @@ class EditModalForm extends React.Component {
     });
   }
 
-    //
-    employeeListUpdata=(data)=>{
-            if(data === null){
-    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
-    return;    
-    };
-    if(data.errorCode !== 0){
-        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
-        return;
-    }
-    if(data.entity !== null){
-        //成功拿到数据
-            let list = data.entity.list;
-            for (let i = 0; i < data.entity.count; i++) {
-              if(list[i].dp && list[i].dp.id === 3){
-                children.push(<Option key={list[i].id}>{list[i].name}</Option>);
-              }
-            }
-        }
-        console.log(children); 
-    }
-    componentDidMount=()=>{
-        fetch(employeeGetPager,this.employeeListUpdata,{pageNO:1,pageSize:1000,ifGetCount:1})
-    }
-
   productNameOnChange=(e)=>{
     let tempData = {}
     Object.assign(tempData,this.state.data);
@@ -200,6 +173,8 @@ class EditModalForm extends React.Component {
     this.setState({
       data:tempData
     });
+   
+    
   }
   productVersionOnChange=(e)=>{
     let tempData = {}
@@ -228,7 +203,7 @@ class EditModalForm extends React.Component {
               initialValue: this.props.record.productName,
             rules: [{ required: true, message: '请输入产品名称!' }],
           })(
-            <Input type="text" onChange={this.nameOnChange} placeholder="请输入产品名称!" />
+            <Input type="text" onChange={this.productNameOnChange} placeholder="请输入产品名称!" />
           )}
         </FormItem>
 
@@ -237,7 +212,7 @@ class EditModalForm extends React.Component {
               initialValue: this.props.record.productVersion,
             rules: [{ required: true, message: '请输入产品版本!' }],
           })(
-            <Input type="phone" onChange={this.phoneOnChange} placeholder="请输入产品版本!" />
+            <Input type="phone" onChange={this.productVersionOnChange} placeholder="请输入产品版本!" />
           )}
         </FormItem>
  
@@ -247,7 +222,7 @@ class EditModalForm extends React.Component {
               initialValue: this.props.record.productPrice,
             rules: [{ required: true, message: '请输入产品市场价!' }],
           })(
-            <Input type="text" onChange={this.addressOnChange} placeholder="请输入产品市场价!" />
+            <Input type="text" onChange={this.productPriceOnChange} placeholder="请输入产品市场价!" />
           )}
         </FormItem>
         <br />
@@ -267,7 +242,7 @@ class EditModalForm extends React.Component {
 
 const WrapAddModalForm = Form.create()(AddModalForm);
 const WrapEditModalForm = Form.create()(EditModalForm);
-class PartnerManager extends React.Component {
+class ProductManager extends React.Component {
     constructor(props) { super(props); }
 
     state = {
@@ -303,7 +278,7 @@ class PartnerManager extends React.Component {
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:pager.current,size:pager.pageSize,ifGetCount:1}
-        fetch(partnerGetPager,this.callbackDate);
+        fetch(productGetPager,this.callbackDate,{pageNO:pager.current,size:pager.pageSize,ifGetCount:1});
     }
    
 
@@ -427,13 +402,20 @@ class PartnerManager extends React.Component {
           title: '版本',
           dataIndex: 'productVersion',
         }, {
+          title: '市场价(￥)',
+          dataIndex: 'productPrice',
+        }, {
           title: '操作',
           dataIndex: 'edit',
           render: (text, record, index) => {
                   return (
                     <div>
-                        <a onClick={()=>this.this.editRow(record)}>编辑</a>{" | "} 
-                        <a onClick={()=>this.deleteProduct(record)}>删除</a>                      
+                        <a onClick={()=>this.editRow(record)}>编辑</a>{" | "} 
+                        <Popconfirm placement="left" title="您确认要删除该产品吗？" 
+                          onConfirm={()=>this.deleteProduct(record)} 
+                          okText="确认" cancelText="取消">
+                        <a >删除</a>                      
+                        </Popconfirm>
                     </div>
                   );
               }, 
@@ -481,4 +463,4 @@ class PartnerManager extends React.Component {
 }
 
 //导出组件
-export default PartnerManager;
+export default ProductManager;
