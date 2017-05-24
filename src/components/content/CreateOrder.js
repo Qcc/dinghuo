@@ -1,6 +1,6 @@
 import React from 'react';
-import { Form, InputNumber, Input,Col,Button,Select,Tooltip,Icon,Modal } from 'antd';
-import {fetch,fetch2,orderCreate,partnerGetPager} from '../../utils/connect';
+import { Form, InputNumber, Input,Col,Button,Select,Tooltip,Icon,Modal,Radio } from 'antd';
+import {fetch,fetch2,orderCreate,partnerGetPager,rechargeCreate} from '../../utils/connect';
 const Option = Select.Option;
 const FormItem = Form.Item;
 const formItemLayout = {
@@ -22,6 +22,7 @@ class CreateOrder extends React.Component{
         this.state={
            loading:false,  //提交按钮加载icon
            submit:false,  // 订单是否重复
+           orderType:'partnerOrder',
            data:{
                 partner:{id:null},
                 product:{productId:3},
@@ -144,7 +145,7 @@ class CreateOrder extends React.Component{
         if(!this.state.data.partner.id){
             this.setState({
                 partnerIdValid:"error",
-                partnerIdHelp:"代理商公司名称不能为空", 
+                partnerIdHelp:"客户公司名称不能为空", 
             });
             flag=false;
         }
@@ -169,9 +170,14 @@ class CreateOrder extends React.Component{
             fetch2(orderCreate,this.orderCreateUpdata,this.state.data)
         }
     }
-
-    render(){
-        return(<Form onSubmit={this.handleSubmit} >
+    //订单类型
+    handleFormLayoutChange = (e) => {
+    this.setState({ orderType: e.target.value });
+    }
+    dynamicForm=()=>{
+        if(this.state.orderType === "partnerOrder"){
+            return(
+                <div>
                 <FormItem
                   {...formItemLayout}
                   label="代理商"
@@ -189,16 +195,15 @@ class CreateOrder extends React.Component{
                        {children}
                      </Select>
                 </FormItem>
-            
                 <FormItem
                   {...formItemLayout}
                   label="产品"
                   required
                 >
                   <Select defaultValue='沟通云桌面' style={{ width: 150 }} onChange={this.handleProductChange}>
-                      <Option value={3}>沟通云桌面</Option>
-                      <Option value={1}>CTBS高级版</Option>
-                      <Option value={2}>CTBS企业版</Option>
+                      <Option value={"3"}>沟通云桌面</Option>
+                      <Option value={"1"}>CTBS高级版</Option>
+                      <Option value={"2"}>CTBS企业版</Option>
                   </Select>
                 </FormItem>
             
@@ -212,7 +217,96 @@ class CreateOrder extends React.Component{
                 >
                   <InputNumber onChange={this.handlePointsChange} defaultValue={this.state.data.points} min={1} max={10000} style={{ width: 150 }}  />
                 </FormItem>
+                </div>
+            );
+        }else if(this.state.orderType === "partnerCashOrder"){
+            return(
+                <FormItem
+                  {...formItemLayout}
+                  label="代理商"
+                  required
+                  validateStatus={this.state.partnerIdValid}
+                  help={this.state.partnerIdHelp}
+                >
+                    <Select
+                       showSearch
+                       style={{ width: 200 }}
+                       style={{ width: '100%' }}
+                       onChange={this.handlePartnerChange}
+                       filterOption={(value, option) => option.props.children.indexOf(value)!=-1}
+                     >
+                       {children}
+                     </Select>
+                </FormItem>
+            );
+
+        }else if(this.state.orderType === "customerOrder"){
+            return(
+                <div>
+                <FormItem
+                  {...formItemLayout}
+                  label="客户名称"
+                  required
+                  validateStatus={this.state.partnerIdValid}
+                  help={this.state.partnerIdHelp}
+                >
+                    <Select
+                       showSearch
+                       style={{ width: 200 }}
+                       style={{ width: '100%' }}
+                       onChange={this.handlePartnerChange}
+                       filterOption={(value, option) => option.props.children.indexOf(value)!=-1}
+                     >
+                       {children}
+                     </Select>
+                </FormItem>
+                <FormItem
+                  {...formItemLayout}
+                  label="产品"
+                  required
+                >
+                  <Select defaultValue='沟通云桌面' style={{ width: 150 }} onChange={this.handleProductChange}>
+                      <Option value={"3"}>沟通云桌面</Option>
+                      <Option value={"1"}>CTBS高级版</Option>
+                      <Option value={"2"}>CTBS企业版</Option>
+                  </Select>
+                </FormItem>
             
+                <FormItem
+                  {...formItemLayout}
+                  label="站点数"
+                  hasFeedback
+                  required
+                  validateStatus={this.state.pointsValid}
+                  help={this.state.pointsHelp}
+                >
+                  <InputNumber onChange={this.handlePointsChange} defaultValue={this.state.data.points} min={1} max={10000} style={{ width: 150 }}  />
+                </FormItem>
+                </div>
+            );
+        }
+
+        
+
+
+
+        
+    }
+
+    render(){
+        return(<Form onSubmit={this.handleSubmit} >
+                <FormItem
+                       required
+                   label="订单类型"
+                   {...formItemLayout}
+                 >
+                   <Radio.Group defaultValue="partnerOrder" onChange={this.handleFormLayoutChange}>
+                     <Radio.Button value="partnerOrder">伙伴订货</Radio.Button>
+                     <Radio.Button value="partnerCashOrder">伙伴压款</Radio.Button>
+                     <Radio.Button value="customerOrder">直销客户</Radio.Button>
+                   </Radio.Group>
+                 </FormItem>
+                {this.dynamicForm()}
                 <FormItem
                   {...formItemLayout}
                   label="总金额"

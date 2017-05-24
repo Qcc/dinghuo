@@ -11,7 +11,7 @@ ajax请求函数
 */
 //获取
 export function fetch(url,onComplete,params = {},method='POST'){
-    console.log("调用了fecth =",'url',url,'method',method,'params:', params);
+    // console.log("调用了fecth =",'url',url,'method',method,'params:', params);
     if(typeof onComplete !== 'function'){
         // console.log("成功获取到数据,回调函数不正确",onComplete);
         return;
@@ -28,7 +28,7 @@ export function fetch(url,onComplete,params = {},method='POST'){
     })
     .then((data) => {
         if(data.status === 200){
-            console.log("成功获取到数据 ",JSON.stringify(data,null,4));
+            // console.log("成功获取到数据 ",JSON.stringify(data,null,4));
             onComplete(data);
         }else{
             onComplete(null);          
@@ -43,7 +43,7 @@ export function fetch(url,onComplete,params = {},method='POST'){
 
 //特殊操作
 export function fetch2(url,onComplete,params = {},method='POST'){
-    console.log("调用了fecth =",'url',url,'method',method,'params:', params);
+    // console.log("调用了fecth =",'url',url,'method',method,'params:', params);
     if(typeof onComplete !== 'function'){
         //console.log("成功获取到数据,回调函数不正确",onComplete);
         return;
@@ -59,7 +59,7 @@ export function fetch2(url,onComplete,params = {},method='POST'){
     })
      .then((data) => {
         if(data.status === 200){
-            console.log("成功获取到数据 ",JSON.stringify(data,null,4));
+            // console.log("成功获取到数据 ",JSON.stringify(data,null,4));
             onComplete(data);
         }else{
             onComplete(null);          
@@ -140,8 +140,11 @@ export const customerGetPager = ROOTURL + "/protected/customer/getPager.api";
 export const serviceCreate = ROOTURL + "/protected/customerservicecharge/create.api";
 export const serviceUpdate = ROOTURL + "/protected/customerservicecharge/update.api";
 export const serviceDelete = ROOTURL + "/protected/customerservicecharge/delete.api";
-export const serviceGetPager = ROOTURL + "/protected/customerservicecharge/getPager.api";
-
+export const serviceGetPager = ROOTURL + "/protected/customerServiceCharge/getPager.api";
+//现金库存管理
+export const rechargeCreate = ROOTURL + "/protected/recharge/create.api";
+export const rechargeTransfer = ROOTURL + "/protected/recharge/transfer.api";
+export const rechargeGetPager = ROOTURL + "/protected/recharge/getPager.api";
 
 
 

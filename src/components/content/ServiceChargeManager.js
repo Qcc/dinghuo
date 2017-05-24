@@ -212,6 +212,8 @@ class ServiceChargeManager extends React.Component {
                 "address":tempArray[i].address,
                 "email":tempArray[i].email,                
                 "license":tempArray[i].license,
+                "assigndate":tempArray[i].assigndate,
+                "money":tempArray[i].money,                
                 "datetime":tempArray[i].datetime,
                 "serviceExpirationDate":tempArray[i].serviceExpirationDate,                
                 "salesuser": tempArray[i].customer && tempArray[i].salesUser && tempArray[i].salesUser.employee &&
@@ -296,6 +298,9 @@ class ServiceChargeManager extends React.Component {
         }, {
           title: '授权码',
           dataIndex: 'license',
+        }, {
+          title: '金额',
+          dataIndex: 'money',
         }, {
           title: '缴费日期',
           dataIndex: 'datetime',

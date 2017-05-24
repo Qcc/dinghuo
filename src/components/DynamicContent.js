@@ -1,30 +1,18 @@
 import React from 'react';
 import { Table,Calendar,Button } from 'antd';
-//销售模块
-import StockManager from './content/StockManager'
 import CreateOrder from './content/CreateOrder'
-import FormalLicenseManager from './content/FormalLicenseManager'
 import PendingOrdersSales from './content/PendingOrdersSales'
-import OrderDetails from './content/OrderDetails'
 import PartnerManager from './content/PartnerManager';
 import PartnerManagerAdmin from './content/PartnerManagerAdmin';
 import CustomerManager from './content/CustomerManager';
 import AgencyPriceManager from './content/AgencyPriceManager';
 import TrailLicenseManager from './content/TrailLicenseManager';
 import ServiceChargeManager from './content/ServiceChargeManager';
-
-//财务模块
 import PendingOrdersFinance from './content/PendingOrdersFinance';
 import HistoryOrders from './content/HistoryOrders';
 import AgencyPriceApproval from './content/AgencyPriceApproval';
-import PartnerDetails from './content/PartnerDetails';
-//管理员
 import EmployeeManager from './content/EmployeeManager';
 import ProductManager from './content/ProductManager';
-
-
-
-//账户信息
 import AccountInfo from './content/AccountInfo'
 
 
@@ -127,48 +115,51 @@ class DynamicContent extends React.Component {
 
     dynamicContent() {
         let menuItem =this.state.menuKey;
-
+        console.log("=================",menuItem,"===============");
         switch(menuItem){
             //销售模块
-            case 'PartnerManager' :
+            case 'PartnerManager_sales' :    //伙伴管理-销售
                 return  <PartnerManager/>;
-            case 'PartnerManager_admin' :
-                return  <PartnerManagerAdmin/>;
-            case 'AgencyPriceManager':
-                return  <AgencyPriceManager />;
-            case 'StockQuery':
-                return <StockManager  />;
-            case 'CreateOrder':
-                return <CreateOrder />;
-            case 'PendingOrders_Sales':
-                return <PendingOrdersSales/>;
-            case 'OrderDetails':
-                return <OrderDetails/>; 
-            case 'FormalLicenseManager':
-                return <FormalLicenseManager/>; 
-            case 'CustomerManager':
+            case 'CustomerManager_sales':   //直销客户管理-销售
                 return <CustomerManager/>; 
-            case 'ServiceChargeManager':
-                return <ServiceChargeManager/>;
-                
-            //财务模块  
-            case 'AgencyPriceApproval':
-                return <AgencyPriceApproval/>;
-            case 'HistoryOrders':
-                return <HistoryOrders/>;
-            case 'PendingOrders_Finance':
-                return <PendingOrdersFinance/>;
-            case 'PartnerDetails':
-                return <PartnerDetails/>;
-            case 'TrailLicenseManager':
+            case 'AgencyPriceApply_sales':    //伙伴价格申请-销售
+                return <AgencyPriceManager/>; 
+            case 'CreateOrder':           //新建订单-销售=== 增加直销客户新建订单
+                return <CreateOrder/>;
+            case 'PendingOrders_sales':   //待处理订单-销售
+                return <PendingOrdersSales/>;
+            case 'OrderDetails':        //历史订单-销售-财务-管理员
+                return <HistoryOrders/>; 
+            case 'TrailLicenseManager':   //临时授权-销售-财务-管理员
                 return <TrailLicenseManager/>;
+            case 'ServiceChargeManager': //维护费-销售-财务-技术-管理员 
+                return <ServiceChargeManager/>;
+            //财务模块  
+            case 'PartnerManager_finance':    //渠道伙伴-财务-管理员
+                return <PartnerManagerAdmin/>;
+            case 'CustomerManager_finance':    //直销客户-财务-管理员====增删改查
+                return <CustomerManager/>;
+            case 'AgencyPriceApproval_finance': //伙伴价格审核-财务-管理员
+                return <AgencyPriceApproval/>;
+            case 'PendingOrders_Finance':   //待处理订单-财务-管理员
+                return <PendingOrdersFinance/>;
+            case 'HistoryOrders':           //历史订单-财务-管理员
+                return <HistoryOrders/>;
             //管理员
-            case 'EmployeeManager':
+            case 'PartnerManager_admin' :  //伙伴管理-财务-管理员
+                return  <PartnerManagerAdmin/>;
+            case 'CustomerManager_admin':    //直销客户-财务-管理员====
+                return <CustomerManager/>;
+            case 'AgencyPriceApproval_admin': //伙伴价格审核-财务-管理员
+                return <AgencyPriceApproval/>;
+            case 'PendingOrders_admin':   //待处理订单-财务-管理员
+                return <PendingOrdersFinance/>;
+            case 'EmployeeManager':    //员工管理-管理员
                 return <EmployeeManager/>;
-            case 'ProductManager':
+            case 'ProductManager':    // 产品管理-管理员
                 return <ProductManager/>;
 
-            case 'MyAccount':
+            case 'MyAccount':   // 账户管理 -销售-财务-技术-管理员
                 return <AccountInfo/>;
             default :
                 return <h1>{menuItem}</h1>;

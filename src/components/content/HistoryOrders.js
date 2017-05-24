@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table } from 'antd';
+import { Table,Modal} from 'antd';
 import {fetch,orderGetPager} from '../../utils/connect';
 
 class HistoryOrders extends React.Component{

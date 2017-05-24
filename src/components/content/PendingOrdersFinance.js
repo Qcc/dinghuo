@@ -61,12 +61,12 @@ class EditModalForm extends React.Component {
     return (
       <Form onSubmit={this.handleSubmit} >  
 
-        <FormItem {...formItemLayout} label="公司名称" >
+        <FormItem {...formItemLayout} label={this.props.record.oederType+"客户"} >
           {getFieldDecorator('company', {
               initialValue: this.props.record.company,
-            rules: [{ required: true, message: '请输入代理商公司名称!' }],
+            rules: [{ required: false, message: '' }],
           })(
-            <Input disabled type="text" placeholder="请输入代理商公司名称" />
+            <Input disabled type="text" /> 
           )}
         </FormItem>
 
@@ -271,7 +271,9 @@ class PendingOrdersFinance extends React.Component{
             sourceData.push({ 
                 "serial":i+1,
                 "id":tempArray[i].id,
-                "company":tempArray[i].partner && tempArray[i].partner.company,
+                "oederType":tempArray[i].customer && tempArray[i].customer.id ?"直销":"渠道",
+                "company":tempArray[i].partner&& tempArray[i].partner.company || 
+                          tempArray[i].customer && tempArray[i].customer.company,
                 "productName":tempArray[i].product && tempArray[i].product.productName,
                 "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
                 "points":tempArray[i].points,
@@ -365,8 +367,11 @@ class PendingOrdersFinance extends React.Component{
         }, {
           title: '订单号',
           dataIndex: "id",
+        }, {
+          title: '客户类型',
+          dataIndex: "oederType",
         },{
-          title: '代理商',
+          title: '公司名称',
           dataIndex: 'company',
         },  {
           title: '产品名称',
@@ -414,7 +419,7 @@ class PendingOrdersFinance extends React.Component{
 
             <Modal
               visible={this.state.editModal.visibleEdit}
-              title="修改订单"
+              title="审核订单"
               onCancel={this.handleEditCancel}
               footer={null}
             >

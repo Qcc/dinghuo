@@ -1,6 +1,6 @@
 import React from 'react';
-import { Table,Icon,Button,Modal,Form,Input,Select,Popconfirm,message} from 'antd';
-import {fetch,orderGetPager,orderfulfill,orderDelete,orderUpdate} from '../../utils/connect';
+import { Table,Icon,Button,Modal,Form,Input,InputNumber,Select,Popconfirm,message} from 'antd';
+import {fetch2,fetch,orderGetPager,orderCreate,orderDelete,orderUpdate,customerGetPager,productGetPager} from '../../utils/connect';
 
 
 const formItemLayout = {
@@ -15,6 +15,177 @@ const formItemLayout = {
 };
 const FormItem = Form.Item;
 const Option = Select.Option;
+const childrenProduct=[];
+const childrenCompany=[];
+
+
+
+class AddModalForm extends React.Component {
+  state={
+      loading:false,
+  }
+
+  customerUpdata=(data)=>{
+            if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    if(data.entity !== null){
+        //成功拿到数据
+            let list = data.entity.list;
+            for (let i = 0; i < list.length; i++) {
+                childrenCompany.push(<Option key={list[i].id}>{list[i].company}</Option>);
+            }
+        }
+        
+    }
+    productUpdata=(data)=>{
+            if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    if(data.entity !== null){
+        //成功拿到数据
+            let list = data.entity.list;
+            for (let i = 0; i < list.length; i++) {
+                childrenProduct.push(<Option key={list[i].productId}>{list[i].productName}</Option>);
+            }
+        }
+        
+    }
+    componentDidMount=()=>{
+        fetch(customerGetPager,this.customerUpdata,{pageNO:1,pageSize:10000,ifGetCount:1});
+        fetch(productGetPager,this.productUpdata,{pageNO:1,pageSize:1000,ifGetCount:1})
+    }
+
+    //添加成功数据后的回调
+  onComplate=(data)=>{
+    this.setState({
+      loading:false,
+    });
+    this.props.handleAddCancel();
+    this.props.form.resetFields();
+    if(data === null){
+      Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+      return;    
+      };
+      if(data.errorCode !== 0){
+          Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+          return;
+      }
+        //表格重新加载数据
+        this.props.componentDidMount();
+        Modal.success({
+              title: '成功',
+              content: '添加订单成功！',
+        });
+  }
+ 
+  //取消添加 并重置表单
+  handleCancel=()=>{
+      this.props.handleAddCancel();
+      this.props.form.resetFields();
+  }
+
+  handleSubmit = (e) => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+          this.setState({
+            loading:true,
+          });
+          fetch2(orderCreate,this.onComplate,{customer:{id:values.company},
+                product:{productId:values.productId},
+                points:values.points,
+                money:values.money,
+                comment:values.comment,});
+      }
+    });
+  }
+  render() {
+    const { getFieldDecorator } = this.props.form;
+    return (
+      <Form onSubmit={this.handleSubmit} >
+
+        <FormItem {...formItemLayout} label="选择客户" required>
+                {getFieldDecorator('company',{
+            rules: [{ required: true, message: '请选择客户!' }],
+          })(
+                    <Select
+                       showSearch
+                       onChange={this.dpOnChange}
+                       style={{ width: 200 }}
+                       style={{ width: '100%' }}
+                       filterOption={(value, option) => option.props.children.indexOf(value)!=-1}
+                     >
+                       {childrenCompany}
+                     </Select>
+                    )}
+        </FormItem>
+
+        <FormItem {...formItemLayout} label="选择产品" required>
+                {getFieldDecorator('productId',{
+            rules: [{ required: true, message: '请选择产品!' }],
+          })(
+                    <Select
+                       showSearch
+                       onChange={this.dpOnChange}
+                       style={{ width: 200 }}
+                       style={{ width: '100%' }}
+                       filterOption={(value, option) => option.props.children.indexOf(value)!=-1}
+                     >
+                       {childrenProduct}
+                     </Select>
+                    )}
+        </FormItem>
+         
+        <FormItem {...formItemLayout} label="站点数" >
+          {getFieldDecorator('points', {
+            rules: [{ required: true, message: '请输入站点数!' }],
+          })(
+            <InputNumber min={1} type="text"  />
+          )}
+        </FormItem>
+
+        <FormItem {...formItemLayout} label="金额" >
+          {getFieldDecorator('money', {
+            rules: [{ required: true, message: '请输入订单金额!' }],
+          })(
+            <InputNumber min={1} type="text"  />
+          )}
+        </FormItem>
+
+        <FormItem {...formItemLayout} label="订单说明" >
+          {getFieldDecorator('comment', {
+            rules: [{ required: false, message: '请输入特别说明!' }],
+          })(
+            <Input type="textarea" rows={4} placeholder="请输入特别说明" />
+          )}
+        </FormItem>
+        
+        <br />
+        <FormItem>
+        <div style={{textAlign:"center"}}>
+          <Button style={{width:"110px",marginRight:"10px"}} onClick={this.handleCancel}>取消</Button>
+          <Button type="dashed" style={{width:"110px",marginRight:"10px"}}
+                  onClick={()=>{this.props.form.resetFields()}}>重置</Button>
+          <Button type="primary" htmlType="submit" loading={this.state.loading}  style={{width:"110px"}}>确定</Button>                              
+        </div>  
+        </FormItem>
+
+      </Form>
+    );
+  }
+}
+
 class EditModalForm extends React.Component {
 
     //确认编辑数据后的回调
@@ -69,7 +240,7 @@ class EditModalForm extends React.Component {
               initialValue: this.props.record.company,
             rules: [{ required: true, message: '请输入代理商公司名称!' }],
           })(
-            <Input type="text" disabled/>
+            <Input type="text" placeholder="请输入代理商公司名称" />
           )}
         </FormItem>
 
@@ -118,8 +289,8 @@ class EditModalForm extends React.Component {
 }
 
 const WrapEditModalForm = Form.create()(EditModalForm);
-
-class PendingOrdersSales extends React.Component{
+const WrapAddModalForm = Form.create()(AddModalForm);
+class CustomerOrderManager extends React.Component{
       constructor(props) { super(props); }
 
     state = {
@@ -140,6 +311,10 @@ class PendingOrdersSales extends React.Component{
                 loadingEdit:false,     
                 data:{},//待编辑行对象                                                                   
             },
+        addModal:{
+                visibleAdd:false, //添加按钮点击  模态框 是否可见
+                loadingAdd:false,   //确认按钮加载中
+            },
     };
 
     handleTableChange = (pagination, filters, sorter) => { //当点击页面下标时，这里传入的pagination.current指向了新页面
@@ -151,8 +326,8 @@ class PendingOrdersSales extends React.Component{
             pagination: pager,
             loading:true,
         });
-        // 真实api加 参数查询分页 
-        fetch(orderGetPager,this.callbackDate,{pageNO:pager.current,size:pager.pageSize,ifGetCount:1,orderType:1});
+        // 真实api加 参数查询分页 {pageNO:pager.current,size:pager.pageSize,ifGetCount:1}
+        fetch(orderGetPager,this.callbackDate,{pageNO:pager.current,size:pager.pageSize,ifGetCount:1,orderType:2});
     }
 
     stateName=(state)=>{
@@ -192,11 +367,10 @@ class PendingOrdersSales extends React.Component{
         let tempArray = data.entity.list;
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
-            if(tempArray[i].state === 4) continue;
             sourceData.push({ 
                 "serial":i+1,
                 "id":tempArray[i].id,
-                "company":tempArray[i].partner && tempArray[i].partner.company,
+                "company":tempArray[i].customer && tempArray[i].customer.company,
                 "productName":tempArray[i].product && tempArray[i].product.productName,
                 "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
                 "points":tempArray[i].points,
@@ -219,8 +393,26 @@ class PendingOrdersSales extends React.Component{
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
-        fetch(orderGetPager,this.callbackDate,{pageNO:1,size:10,ifGetCount:1,orderType:1});
+        fetch(orderGetPager,this.callbackDate,{pageNO:1,size:10,ifGetCount:1,orderType:2});
     }
+
+    //新建产品
+    createOrder=()=>{
+        let state = {...this.state.addModal};
+            state.visibleAdd=true;
+        this.setState({
+            addModal:state,
+        });
+    }
+    //取消新建
+    handleAddCancel=()=>{
+        let state = {...this.state.addModal};
+            state.visibleAdd=false;
+        this.setState({
+            addModal:state,
+        });
+    }
+
     //编辑表格行
     editRow=(record)=>{
         let state = {...this.state.editModal};
@@ -322,7 +514,7 @@ class PendingOrdersSales extends React.Component{
           title: '订单号',
           dataIndex: "id",
         },{
-          title: '代理商',
+          title: '公司名称',
           dataIndex: 'company',
         },  {
           title: '产品名称',
@@ -356,6 +548,10 @@ class PendingOrdersSales extends React.Component{
 
         return (
             <div>
+              <div style={{position:'relative',marginBottom:"5px"}}>
+              <h2 style={{display:'inline-block'}}>终端订单管理</h2>
+              <Button type="primary" onClick={this.createOrder} style={{position:"absolute",right:0}}>新建订单</Button>
+              </div>
             <Table bordered columns={Columns}
                 rowKey={record => record.id}          //Table.rowKey：表格行 key 的取值，可以是字符串或一个函数 （我的理解：给每一行一个唯一标识）
                 dataSource={this.state.data}
@@ -363,7 +559,16 @@ class PendingOrdersSales extends React.Component{
                 loading={this.state.loading}        //Table.loading：页面是否加载中
                 onChange={this.handleTableChange}  //Table.onChange：分页、排序、筛选变化时触发
             />
-
+            
+            <Modal
+              visible={this.state.addModal.visibleAdd}
+              title="新建订单"
+              onCancel={this.handleAddCancel}
+              footer={null}>
+               <WrapAddModalForm handleAddCancel={this.handleAddCancel} 
+                                 componentDidMount={this.componentDidMount}
+                                />
+            </Modal>
 
             <Modal
               visible={this.state.editModal.visibleEdit}
@@ -379,4 +584,4 @@ class PendingOrdersSales extends React.Component{
             </div>);
     }
 }
-export default PendingOrdersSales;
+export default CustomerOrderManager;
