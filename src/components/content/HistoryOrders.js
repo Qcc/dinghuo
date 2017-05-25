@@ -49,6 +49,19 @@ class HistoryOrders extends React.Component{
         }
         return s;
     }
+    orderTypeName=(orderType)=>{
+        let s='';
+        switch(orderType){
+            case 1:s='伙伴订货';
+            break;
+            case 2:s='直销客户';
+            break;
+            case 3:s='伙伴压款';
+            break;
+            default:s='无';
+        }
+        return s;
+    }
 
     //获取数据后映射到 table state
     callbackDate = (data) => {
@@ -74,6 +87,9 @@ class HistoryOrders extends React.Component{
                 sourceData.push({ 
                     "serial":i+1,
                     "id":tempArray[i].id,
+                    "transferDatetime":tempArray[i].transferDatetime,
+                    "orderTypeName":this.orderTypeName(tempArray[i].orderType),
+                    "orderType":tempArray[i].orderType,
                     "company":tempArray[i].partner && tempArray[i].partner.company,
                     "productName":tempArray[i].product && tempArray[i].product.productName,
                     "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
@@ -107,13 +123,16 @@ class HistoryOrders extends React.Component{
     render() {
          //伙伴表 字段
         const Columns = [{
-          title: '序号',
-          dataIndex: 'serial',
-        }, {
           title: '订单号',
           dataIndex: "id",
         },{
-          title: '代理商',
+          title: '收款时间',
+          dataIndex: 'transferDatetime',
+        }, {
+          title: '订单类型',
+          dataIndex: 'orderTypeName',
+        }, {
+          title: '客户公司',
           dataIndex: 'company',
         },  {
           title: '产品名称',

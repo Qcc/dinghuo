@@ -300,7 +300,7 @@ class PartnerManager extends React.Component {
           title: '合作状态',
           dataIndex: 'stateName',
         }, {
-          title: '销售代表',
+          title: '销售',
           dataIndex: 'user',
         },{
           title: <Tooltip placement="left" title='禁用后代理商将不能再登录伙伴系统'>操作</Tooltip>,

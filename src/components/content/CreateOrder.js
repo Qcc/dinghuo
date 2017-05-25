@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, InputNumber, Input,Col,Button,Select,Tooltip,Icon,Modal,Radio } from 'antd';
-import {fetch,fetch2,orderCreate,partnerGetPager,rechargeCreate} from '../../utils/connect';
+import {fetch,fetch2,orderCreate,partnerGetPager,customerGetPager,productGetPager,rechargeCreate} from '../../utils/connect';
 const Option = Select.Option;
 const FormItem = Form.Item;
 const formItemLayout = {
@@ -14,7 +14,9 @@ const formItemLayout = {
   },
 };
 
-const children=[];
+const childrenProduct=[];
+const childrenPartner=[];
+const childrenCustomer=[];
 
 class CreateOrder extends React.Component{
     constructor(props){
@@ -23,19 +25,24 @@ class CreateOrder extends React.Component{
            loading:false,  //提交按钮加载icon
            submit:false,  // 订单是否重复
            orderType:'partnerOrder',
-           data:{
-                partner:{id:null},
-                product:{productId:3},
-                points:50,
-                money:null,
-                comment:'',
-            },
-            partnerIdValid:"",
-            partnerIdHelp:"",            
-            pointsValid:"",
-            pointsHelp:"",            
-            moneyValid:"",
-            moneyHelp:"",            
+           data:{},
+           partnerIdValid:"",
+           partnerIdHelp:"",            
+           pointsValid:"",
+           pointsHelp:"",
+           productIdValid:"",
+           productIdHelp:"",
+           customerIdValid:"",
+           customerIdHelp:"",           
+           moneyValid:"",
+           moneyHelp:"", 
+           //表单数据
+           partner:"",
+           points:"",
+           product:"",
+           customer:"",
+           money:"",
+           comment:"",           
         }
     }
 
@@ -52,30 +59,82 @@ class CreateOrder extends React.Component{
         //成功拿到数据
             let list = data.entity.list;
             for (let i = 0; i < data.entity.count; i++) {
-                children.push(<Option key={list[i].id}>{list[i].company}</Option>);
+                childrenPartner.push(<Option key={list[i].id}>{list[i].company}</Option>);
+            }
+        } 
+    }
+    customerListUpdata=(data)=>{
+            if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    if(data.entity !== null){
+        //成功拿到数据
+            let list = data.entity.list;
+            for (let i = 0; i < data.entity.count; i++) {
+                childrenCustomer.push(<Option key={list[i].id}>{list[i].company}</Option>);
+            }
+        } 
+    }
+    productListUpdata=(data)=>{
+            if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    if(data.entity !== null){
+        //成功拿到数据
+            let list = data.entity.list;
+            for (let i = 0; i < data.entity.count; i++) {
+                childrenProduct.push(<Option key={list[i].productId}>{list[i].productName}</Option>);
             }
         } 
     }
     componentDidMount=()=>{
-        fetch(partnerGetPager,this.partnerListUpdata,{pageNO:1,pageSize:1000,ifGetCount:1})
+        fetch(partnerGetPager,this.partnerListUpdata,{pageNO:1,pageSize:1000,ifGetCount:1});
+        fetch(customerGetPager,this.customerListUpdata,{pageNO:1,pageSize:10000,ifGetCount:1});     
+        fetch(productGetPager,this.productListUpdata,{pageNO:1,pageSize:1000,ifGetCount:1});                  
     }
     //选择公司
     handlePartnerChange=(value)=>{
         let state = {...this.state.data};
-            state.partner.id = +value;
+            state.partner={id:+value};
             this.setState({
+                partner:value,
                 data:state,
                 partnerIdValid:"",
                 partnerIdHelp:"",
                 submit:false,        
             });
     }
+    //选择客户
+    handleCustomerChange=(value)=>{
+        let state = {...this.state.data};
+            state.customer = {id:+value};
+            this.setState({
+                customer:value,
+                data:state,
+                customerIdValid:"",
+                customerIdHelp:"",
+                submit:false,        
+            });
+    }
     //选择产品
     handleProductChange=(value)=>{
         let state = {...this.state.data};
-            state.product.productId=value;
+            state.product={productId:+value};
             this.setState({
+                product:value,
                 data:state,
+                productIdValid:"",
+                productIdHelp:"",
                 submit:false,
             });
     }
@@ -84,6 +143,7 @@ class CreateOrder extends React.Component{
      let state = {...this.state.data}
      state.points=value;
      this.setState({
+         points:value,
         data:state,
         pointsValid:"",
         pointsHelp:"",
@@ -95,6 +155,7 @@ class CreateOrder extends React.Component{
      let state = {...this.state.data}
      state.money=value;
      this.setState({
+         money:value,
         data:state,
         moneyValid:"",
         moneyHelp:"", 
@@ -106,6 +167,7 @@ class CreateOrder extends React.Component{
      let state = {...this.state.data}
      state.comment=e.target.value;
      this.setState({
+         comment:e.target.value,
         data:state,
      });
     }
@@ -142,14 +204,14 @@ class CreateOrder extends React.Component{
             return;
         }
         let flag=true;
-        if(!this.state.data.partner.id){
+        if(!this.state.data.partner && this.state.orderType !== "customerOrder"){
             this.setState({
                 partnerIdValid:"error",
                 partnerIdHelp:"客户公司名称不能为空", 
             });
             flag=false;
         }
-        if(!this.state.data.points){
+        if(!this.state.data.points && this.state.orderType !== "partnerCashOrder"){
             this.setState({
                 pointsValid:"error",
                 pointsHelp:"站点数不能为空", 
@@ -163,18 +225,42 @@ class CreateOrder extends React.Component{
             });
             flag=false;
         }
+        if(!this.state.data.product && this.state.orderType !== "partnerCashOrder"){
+            this.setState({
+                productIdValid:"error",
+                productIdHelp:"请选择产品！", 
+            });
+            flag=false;
+        }
+        if(!this.state.data.customer && this.state.orderType === "customerOrder"){
+            this.setState({
+                customerIdValid:"error",
+                customerIdHelp:"请选择终端客户！", 
+            });
+            flag=false;
+        }
         if(flag){
             this.setState({
                 loading:true,
             });
-            fetch2(orderCreate,this.orderCreateUpdata,this.state.data)
+        fetch2(orderCreate,this.orderCreateUpdata,this.state.data)
         }
     }
     //订单类型
     handleFormLayoutChange = (e) => {
-    this.setState({ orderType: e.target.value });
+        this.setState({ 
+            data:{}, 
+            orderType: e.target.value, 
+            partner:"",
+            points:"",
+            product:"",
+            customer:"",
+            money:"",
+           comment:"",                       
+        });
     }
     dynamicForm=()=>{
+        
         if(this.state.orderType === "partnerOrder"){
             return(
                 <div>
@@ -187,23 +273,29 @@ class CreateOrder extends React.Component{
                 >
                     <Select
                        showSearch
+                       value={this.state.partner}                       
                        style={{ width: 200 }}
                        style={{ width: '100%' }}
                        onChange={this.handlePartnerChange}
                        filterOption={(value, option) => option.props.children.indexOf(value)!=-1}
                      >
-                       {children}
+                       {childrenPartner}
                      </Select>
                 </FormItem>
                 <FormItem
                   {...formItemLayout}
                   label="产品"
+                  validateStatus={this.state.productIdValid}
+                  help={this.state.productIdHelp}
                   required
                 >
-                  <Select defaultValue='沟通云桌面' style={{ width: 150 }} onChange={this.handleProductChange}>
-                      <Option value={"3"}>沟通云桌面</Option>
-                      <Option value={"1"}>CTBS高级版</Option>
-                      <Option value={"2"}>CTBS企业版</Option>
+                  <Select
+                       value={this.state.product}                  
+                       style={{ width: 200 }}
+                       style={{ width: '100%' }}
+                       onChange={this.handleProductChange}
+                     >
+                       {childrenProduct}
                   </Select>
                 </FormItem>
             
@@ -215,7 +307,7 @@ class CreateOrder extends React.Component{
                   validateStatus={this.state.pointsValid}
                   help={this.state.pointsHelp}
                 >
-                  <InputNumber onChange={this.handlePointsChange} defaultValue={this.state.data.points} min={1} max={10000} style={{ width: 150 }}  />
+                  <InputNumber onChange={this.handlePointsChange} value={this.state.points} min={1} max={10000} style={{ width: 150 }}  />
                 </FormItem>
                 </div>
             );
@@ -230,12 +322,13 @@ class CreateOrder extends React.Component{
                 >
                     <Select
                        showSearch
+                       value={this.state.partner}
                        style={{ width: 200 }}
                        style={{ width: '100%' }}
                        onChange={this.handlePartnerChange}
                        filterOption={(value, option) => option.props.children.indexOf(value)!=-1}
                      >
-                       {children}
+                       {childrenPartner}
                      </Select>
                 </FormItem>
             );
@@ -247,29 +340,35 @@ class CreateOrder extends React.Component{
                   {...formItemLayout}
                   label="客户名称"
                   required
-                  validateStatus={this.state.partnerIdValid}
-                  help={this.state.partnerIdHelp}
+                  validateStatus={this.state.customerIdValid}
+                  help={this.state.customerIdHelp}
                 >
                     <Select
                        showSearch
+                       value={this.state.customer}                       
                        style={{ width: 200 }}
                        style={{ width: '100%' }}
-                       onChange={this.handlePartnerChange}
+                       onChange={this.handleCustomerChange}
                        filterOption={(value, option) => option.props.children.indexOf(value)!=-1}
                      >
-                       {children}
+                       {childrenCustomer}
                      </Select>
                 </FormItem>
                 <FormItem
                   {...formItemLayout}
                   label="产品"
                   required
+                  validateStatus={this.state.productIdValid}
+                  help={this.state.productIdHelp}
                 >
-                  <Select defaultValue='沟通云桌面' style={{ width: 150 }} onChange={this.handleProductChange}>
-                      <Option value={"3"}>沟通云桌面</Option>
-                      <Option value={"1"}>CTBS高级版</Option>
-                      <Option value={"2"}>CTBS企业版</Option>
-                  </Select>
+                   <Select
+                       value={this.state.product}                   
+                       style={{ width: 200 }}
+                       style={{ width: '100%' }}
+                       onChange={this.handleProductChange}
+                     >
+                       {childrenProduct}
+                     </Select>
                 </FormItem>
             
                 <FormItem
@@ -280,18 +379,12 @@ class CreateOrder extends React.Component{
                   validateStatus={this.state.pointsValid}
                   help={this.state.pointsHelp}
                 >
-                  <InputNumber onChange={this.handlePointsChange} defaultValue={this.state.data.points} min={1} max={10000} style={{ width: 150 }}  />
+                  <InputNumber onChange={this.handlePointsChange} value={this.state.points} min={1}  style={{ width: 150 }}  />
                 </FormItem>
                 </div>
             );
-        }
-
-        
-
-
-
-        
-    }
+        }   
+    }  
 
     render(){
         return(<Form onSubmit={this.handleSubmit} >
@@ -317,11 +410,10 @@ class CreateOrder extends React.Component{
                 >
                   <InputNumber 
                                 min={0}
-                                max={10000}
                                 style={{width:"150px"}}
-                                defaultValue={this.state.data.money}
-                                formatter={value => `￥ ${value}`}
-                                parser={value => value.replace(/\￥\s?/g, '')}
+                                value={this.state.money}
+                                formatter={value => `￥${value}`}
+                                parser={value => value.replace('￥', '')}
                                 onChange={this.onPriceChange}
                               />
                               <Tooltip title="此处为总价,请设置一个购买所有站点的总金额。">
@@ -333,7 +425,7 @@ class CreateOrder extends React.Component{
                   {...formItemLayout}
                   label="备注"
                 >
-                  <Input defaultValue={this.state.data.comment} onChange={this.onCommentChange} type="textarea" rows={4} placeholder="订单特别说明" id="tips" />
+                  <Input value={this.state.comment} onChange={this.onCommentChange} type="textarea" rows={4} placeholder="订单特别说明" id="tips" />
                 </FormItem>
                 <br/>
                 <FormItem>

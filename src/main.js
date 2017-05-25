@@ -7,7 +7,7 @@ import DynamicMenu from './components/DynamicMenu.js';
 import DynamicContent from './components/DynamicContent.js';
 import DynamicBreadcrumb from './components/DynamicBreadcrumb.js';
 import KtFooter from './components/Footer.js';
-import {fetch,logoutApi} from './utils/connect';
+import {fetch,logoutApi,isLoggedIn} from './utils/connect';
 import styles from "./styles/main.css";
 
 const confirm = Modal.confirm;
@@ -44,7 +44,33 @@ let indexURL = "http://localhost:8000/index.html";
         onCancel() {
         },
       }); 
+    };
+class IsLoggedIn extends React.Component{
+
+    timer =()=> setInterval(()=>{fetch(isLoggedIn,this.isLoggedInUpdate);},600000);
+    componentDidMount=()=>{
+       this.timer();
     }
+    
+    isLoggedInUpdate=(data)=>{
+        if(data === null){
+        Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+        return;    
+        };
+        if(data.errorCode !== 0){
+            Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+            return;
+        }
+       if(data.entity === 0){
+           Modal.error({title: '错误！',content:'当前帐号已退出，点击按钮返回主页！'});            
+           clearInterval(this.timer);
+        } 
+    }
+    render(){
+        return null;
+    }
+}
+    
 
   
 
@@ -57,10 +83,10 @@ ReactDOM.render(
                 theme="dark"
                 mode="horizontal"
                 style={{ lineHeight: '64px' }}
-                onClick= {showConfirm }>
+                >
               <Menu.Item key="home">首页</Menu.Item>
               <Menu.Item key="neworders">最新订单</Menu.Item>
-              <Menu.Item key="logout" style={{float:'right'}}><Icon type="logout" />退出</Menu.Item>
+              <Menu.Item key="logout" style={{float:'right'}}><span  onClick= {showConfirm }  ><Icon type="logout" />退出</span></Menu.Item>
             </Menu>
         </Header>
         <Layout>
@@ -75,5 +101,6 @@ ReactDOM.render(
         <Loading {...CommonProps} />
     </Layout>
     <KtFooter/>
+    <IsLoggedIn/>
     </div>,
 document.getElementById('root'));

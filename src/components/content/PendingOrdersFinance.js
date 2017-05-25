@@ -61,7 +61,7 @@ class EditModalForm extends React.Component {
     return (
       <Form onSubmit={this.handleSubmit} >  
 
-        <FormItem {...formItemLayout} label={this.props.record.oederType+"客户"} >
+        <FormItem {...formItemLayout} label={this.props.record.orderTypeName+"客户"} >
           {getFieldDecorator('company', {
               initialValue: this.props.record.company,
             rules: [{ required: false, message: '' }],
@@ -69,8 +69,8 @@ class EditModalForm extends React.Component {
             <Input disabled type="text" /> 
           )}
         </FormItem>
-
-        <FormItem {...formItemLayout} label="产品" required>
+        {this.props.record.orderType ===3?"":
+        <FormItem {...formItemLayout} label="产品">
                 {getFieldDecorator('productName', {initialValue: this.props.record.productName,
                      })(
                     <Select disabled>
@@ -79,29 +79,29 @@ class EditModalForm extends React.Component {
                        <Option value="isv">CTBS企业版</Option>
                      </Select>
                     )}
-        </FormItem>
-
+        </FormItem>}
+        {this.props.record.orderType ===3?"":
         <FormItem {...formItemLayout} label="站点数" >
           {getFieldDecorator('points', {
               initialValue: this.props.record.points,
-            rules: [{ required: true, message: '请输入站点数!' }],
+            rules: [{ required: false, message: '请输入站点数!' }],
           })(
             <Input disabled type="text" placeholder="请输入站点数" />
           )}
-        </FormItem>
-
+        </FormItem>}
+        
         <FormItem {...formItemLayout} label="金额" >
           {getFieldDecorator('money', {
               initialValue: this.props.record.money,
-            rules: [{ required: true, message: '请输入订单金额！' }],
+            rules: [{ required: false, message: '请输入订单金额！' }],
           })(
             <Input disabled  type="phone" placeholder="请输入金额" />
           )}
         </FormItem>
 
-        <FormItem {...formItemLayout} required label="订单价格审核" >
+        <FormItem {...formItemLayout} required label="审核" >
              {getFieldDecorator('state', {
-            rules: [{ required: true, message: '请选择是确认价格，确认选通过，不确认选不通过。' }],
+            rules: [{ required: false, message: '请选择是确认价格，确认选通过，不确认选不通过。' }],
           })(
              <RadioGroup >
                <Radio value={1}>通过</Radio>
@@ -246,6 +246,19 @@ class PendingOrdersFinance extends React.Component{
         }
         return s;
     }
+    orderTypeName=(orderType)=>{
+        let s='';
+        switch(orderType){
+            case 1:s='伙伴订货';
+            break;
+            case 2:s='直销客户';
+            break;
+            case 3:s='伙伴压款';
+            break;
+            default:s='无';
+        }
+        return s;
+    }
 
     //获取数据后映射到 table state
     callbackDate = (data) => {
@@ -271,7 +284,10 @@ class PendingOrdersFinance extends React.Component{
             sourceData.push({ 
                 "serial":i+1,
                 "id":tempArray[i].id,
-                "oederType":tempArray[i].customer && tempArray[i].customer.id ?"直销":"渠道",
+                "createDatetime":tempArray[i].createDatetime,
+                "orderType":tempArray[i].orderType,
+                "orderTypeName":this.orderTypeName(tempArray[i].orderType),
+                "orderType":tempArray[i].orderType,
                 "company":tempArray[i].partner&& tempArray[i].partner.company || 
                           tempArray[i].customer && tempArray[i].customer.company,
                 "productName":tempArray[i].product && tempArray[i].product.productName,
@@ -280,7 +296,8 @@ class PendingOrdersFinance extends React.Component{
                 "money":tempArray[i].money,
                 "state":tempArray[i].state,  
                 "stateName":this.stateName(tempArray[i].state),                                              
-                "sales":tempArray[i].user && tempArray[i].user.name,
+                "sales":tempArray[i].createdByUser && tempArray[i].createdByUser.employee &&
+                         tempArray[i].createdByUser.employee.name,
                 "comment":tempArray[i].comment,
             });
         }
@@ -362,14 +379,14 @@ class PendingOrdersFinance extends React.Component{
     render() {
          //伙伴表 字段
         const Columns = [{
-          title: '序号',
-          dataIndex: 'serial',
-        }, {
           title: '订单号',
           dataIndex: "id",
         }, {
+          title: '订单日期',
+          dataIndex: "createDatetime",
+        }, {
           title: '客户类型',
-          dataIndex: "oederType",
+          dataIndex: "orderTypeName",
         },{
           title: '公司名称',
           dataIndex: 'company',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table,Icon,Button,Modal,Form,Input,Select,Popconfirm,message} from 'antd';
-import {fetch,orderGetPager,orderfulfill,orderDelete,orderUpdate} from '../../utils/connect';
+import {fetch,fetch2,orderGetPager,orderfulfill,orderDelete,orderUpdate} from '../../utils/connect';
 
 
 const formItemLayout = {
@@ -50,12 +50,23 @@ class EditModalForm extends React.Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
+          if(record.orderType !==3){
           if(record.company ==values.company && record.points == values.points &&
-             record.productName == values.productName && record.sum ==values.sum){
+             record.productName == values.productName && record.money ==values.money){
             this.props.handleEditCancel();                
             return; 
             }
-            fetch(orderUpdate,this.onComplate,values,"POST");
+          }else{
+             if(record.company ==values.company && record.money ==values.money){
+            this.props.handleEditCancel();                
+            return; 
+            } 
+          }
+        let param = {
+            condition: {id:this.props.record.id},
+            entity: values
+          }
+        fetch2(orderUpdate,this.onComplate,param);
       }
     });
   }
@@ -67,13 +78,14 @@ class EditModalForm extends React.Component {
         <FormItem {...formItemLayout} label="公司名称" >
           {getFieldDecorator('company', {
               initialValue: this.props.record.company,
-            rules: [{ required: true, message: '请输入代理商公司名称!' }],
+            rules: [{ required: false, message: '请输入客户公司名称!' }],
           })(
             <Input type="text" disabled/>
           )}
         </FormItem>
 
-        <FormItem {...formItemLayout} label="产品" required>
+        {this.props.record.orderType === 3?'':
+        <FormItem {...formItemLayout} label="产品" >
                 {getFieldDecorator('productName', {initialValue: this.props.record.productName,
                      })(
                     <Select>
@@ -82,21 +94,21 @@ class EditModalForm extends React.Component {
                        <Option value="isv">CTBS企业版</Option>
                      </Select>
                     )}
-        </FormItem>
-
+        </FormItem>}
+        {this.props.record.orderType === 3?'':
         <FormItem {...formItemLayout} label="站点数" >
           {getFieldDecorator('points', {
               initialValue: this.props.record.points,
-            rules: [{ required: true, message: '请输入站点数!' }],
+            rules: [{ required: false, message: '请输入站点数!' }],
           })(
             <Input type="text" placeholder="请输入站点数" />
           )}
-        </FormItem>
+        </FormItem>}
 
         <FormItem {...formItemLayout} label="金额" >
-          {getFieldDecorator('sum', {
-              initialValue: this.props.record.sum,
-            rules: [{ required: true, message: '请输入订单金额！' }],
+          {getFieldDecorator('money', {
+              initialValue: this.props.record.money,
+            rules: [{ required: false, message: '请输入订单金额！' }],
           })(
             <Input type="phone" placeholder="请输入金额" />
           )}
@@ -152,7 +164,7 @@ class PendingOrdersSales extends React.Component{
             loading:true,
         });
         // 真实api加 参数查询分页 
-        fetch(orderGetPager,this.callbackDate,{pageNO:pager.current,size:pager.pageSize,ifGetCount:1,orderType:1});
+        fetch(orderGetPager,this.callbackDate,{pageNO:pager.current,size:pager.pageSize,ifGetCount:1});
     }
 
     stateName=(state)=>{
@@ -168,6 +180,20 @@ class PendingOrdersSales extends React.Component{
             break;
             case 4:s='已完成';
             break;
+            default:s='无';            
+        }
+        return s;
+    }
+    orderTypeName=(orderType)=>{
+        let s='';
+        switch(orderType){
+            case 1:s='伙伴订货';
+            break;
+            case 2:s='直销客户';
+            break;
+            case 3:s='伙伴压款';
+            break;
+            default:s='无';
         }
         return s;
     }
@@ -196,14 +222,19 @@ class PendingOrdersSales extends React.Component{
             sourceData.push({ 
                 "serial":i+1,
                 "id":tempArray[i].id,
-                "company":tempArray[i].partner && tempArray[i].partner.company,
+                "createDatetime":tempArray[i].createDatetime,
+                "orderTypeName":this.orderTypeName(tempArray[i].orderType),
+                "orderType":tempArray[i].orderType,                
+                "company":tempArray[i].partner && tempArray[i].partner.company || 
+                          tempArray[i].customer && tempArray[i].customer.company,
                 "productName":tempArray[i].product && tempArray[i].product.productName,
                 "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
                 "points":tempArray[i].points,
                 "money":tempArray[i].money,
                 "state":tempArray[i].state,  
                 "stateName":this.stateName(tempArray[i].state),                                              
-                "sales":tempArray[i].user && tempArray[i].user.name,
+                "sales":tempArray[i].createdByUser && tempArray[i].createdByUser.employee &&
+                         tempArray[i].createdByUser.employee.name,
             });
         }
         this.setState({
@@ -219,7 +250,7 @@ class PendingOrdersSales extends React.Component{
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
-        fetch(orderGetPager,this.callbackDate,{pageNO:1,size:10,ifGetCount:1,orderType:1});
+        fetch(orderGetPager,this.callbackDate,{pageNO:1,size:10,ifGetCount:1});
     }
     //编辑表格行
     editRow=(record)=>{
@@ -301,10 +332,12 @@ class PendingOrdersSales extends React.Component{
         switch(record.state){
             case -2:
                 return <div>
-                        <a onClick={()=>this.editRow(record)}>编辑</a> / 
+                        <a style={{color:"#ccc"}} >编辑</a> /                         
+                        <a style={{color:"#ccc"}} >删除</a>                        
+                        {/*<a style={{color:"#ccc"}} onClick={()=>this.editRow(record)}>编辑</a> / 
                         <Popconfirm title="您确认要删除该订单吗?" onConfirm={this.confirmDelete} okText="确认删除" cancelText="不删除">
-                        <a onClick={()=>this.saveRow(record)}>删除</a>
-                        </Popconfirm>
+                        <a style={{color:"#ccc"}} onClick={()=>this.saveRow(record)}>删除</a>
+                        </Popconfirm>*/}
                         </div> ;
             case 3:
                 return <Popconfirm title="您确认要给该代理商发货吗?"  onConfirm={this.confirmDelivery} okText="确认发货" cancelText="不发货">
@@ -316,13 +349,16 @@ class PendingOrdersSales extends React.Component{
     render() {
          //伙伴表 字段
         const Columns = [{
-          title: '序号',
-          dataIndex: 'serial',
-        }, {
           title: '订单号',
           dataIndex: "id",
         },{
-          title: '代理商',
+          title: '创建日期',
+          dataIndex: "createDatetime",
+        },{
+          title: '订单类型',
+          dataIndex: "orderTypeName",
+        },{
+          title: '客户',
           dataIndex: 'company',
         },  {
           title: '产品名称',

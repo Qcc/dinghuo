@@ -11,7 +11,7 @@ ajax请求函数
 */
 //获取
 export function fetch(url,onComplete,params = {},method='POST'){
-    // console.log("调用了fecth =",'url',url,'method',method,'params:', params);
+    console.log("调用了fecth =",'url',url,'method',method,'params:', params);
     if(typeof onComplete !== 'function'){
         // console.log("成功获取到数据,回调函数不正确",onComplete);
         return;
@@ -28,7 +28,7 @@ export function fetch(url,onComplete,params = {},method='POST'){
     })
     .then((data) => {
         if(data.status === 200){
-            // console.log("成功获取到数据 ",JSON.stringify(data,null,4));
+            console.log("成功获取到数据 ",JSON.stringify(data,null,4));
             onComplete(data);
         }else{
             onComplete(null);          
@@ -43,9 +43,9 @@ export function fetch(url,onComplete,params = {},method='POST'){
 
 //特殊操作
 export function fetch2(url,onComplete,params = {},method='POST'){
-    // console.log("调用了fecth =",'url',url,'method',method,'params:', params);
+     console.log("调用了fecth =",'url',url,'method',method,'params:', params);
     if(typeof onComplete !== 'function'){
-        //console.log("成功获取到数据,回调函数不正确",onComplete);
+        console.log("成功获取到数据,回调函数不正确",onComplete);
         return;
     }
     reqwest({
@@ -74,7 +74,9 @@ export function fetch2(url,onComplete,params = {},method='POST'){
 
 
 //退出
-export const logoutApi = ROOTURL+"/public/user/logout.api";
+export const logoutApi = ROOTURL + "/public/user/logout.api";
+//是否登录
+export const isLoggedIn = ROOTURL + "/public/user/isLoggedIn.api";
 //登录
 export const loginApi =ROOTURL +'/public/user/koutonlogin.api';
 //动态菜单

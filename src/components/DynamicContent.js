@@ -5,6 +5,7 @@ import PendingOrdersSales from './content/PendingOrdersSales'
 import PartnerManager from './content/PartnerManager';
 import PartnerManagerAdmin from './content/PartnerManagerAdmin';
 import CustomerManager from './content/CustomerManager';
+import CustomerManagerAdmin from './content/CustomerManagerAdmin';
 import AgencyPriceManager from './content/AgencyPriceManager';
 import TrailLicenseManager from './content/TrailLicenseManager';
 import ServiceChargeManager from './content/ServiceChargeManager';
@@ -124,7 +125,7 @@ class DynamicContent extends React.Component {
                 return <CustomerManager/>; 
             case 'AgencyPriceApply_sales':    //伙伴价格申请-销售
                 return <AgencyPriceManager/>; 
-            case 'CreateOrder':           //新建订单-销售=== 增加直销客户新建订单
+            case 'CreateOrder':           //新建订单-销售 
                 return <CreateOrder/>;
             case 'PendingOrders_sales':   //待处理订单-销售
                 return <PendingOrdersSales/>;
@@ -137,8 +138,8 @@ class DynamicContent extends React.Component {
             //财务模块  
             case 'PartnerManager_finance':    //渠道伙伴-财务-管理员
                 return <PartnerManagerAdmin/>;
-            case 'CustomerManager_finance':    //直销客户-财务-管理员====增删改查
-                return <CustomerManager/>;
+            // case 'CustomerManager_finance':    //直销客户-财务-管理员 
+            //     return <CustomerManagerAdmin/>;
             case 'AgencyPriceApproval_finance': //伙伴价格审核-财务-管理员
                 return <AgencyPriceApproval/>;
             case 'PendingOrders_Finance':   //待处理订单-财务-管理员
@@ -149,7 +150,7 @@ class DynamicContent extends React.Component {
             case 'PartnerManager_admin' :  //伙伴管理-财务-管理员
                 return  <PartnerManagerAdmin/>;
             case 'CustomerManager_admin':    //直销客户-财务-管理员====
-                return <CustomerManager/>;
+                return <CustomerManagerAdmin/>;
             case 'AgencyPriceApproval_admin': //伙伴价格审核-财务-管理员
                 return <AgencyPriceApproval/>;
             case 'PendingOrders_admin':   //待处理订单-财务-管理员
