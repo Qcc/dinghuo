@@ -281,7 +281,8 @@ class PendingOrdersFinance extends React.Component{
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
             if(tempArray[i].state === 4) continue;
-            sourceData.push({ 
+            if(tempArray[i].state === 1 || tempArray[i].state === 2){
+              sourceData.unshift({ 
                 "serial":i+1,
                 "id":tempArray[i].id,
                 "createDatetime":tempArray[i].createDatetime,
@@ -299,7 +300,28 @@ class PendingOrdersFinance extends React.Component{
                 "sales":tempArray[i].createdByUser && tempArray[i].createdByUser.employee &&
                          tempArray[i].createdByUser.employee.name,
                 "comment":tempArray[i].comment,
-            });
+              });
+            }else{
+              sourceData.push({ 
+                "serial":i+1,
+                "id":tempArray[i].id,
+                "createDatetime":tempArray[i].createDatetime,
+                "orderType":tempArray[i].orderType,
+                "orderTypeName":this.orderTypeName(tempArray[i].orderType),
+                "orderType":tempArray[i].orderType,
+                "company":tempArray[i].partner&& tempArray[i].partner.company || 
+                          tempArray[i].customer && tempArray[i].customer.company,
+                "productName":tempArray[i].product && tempArray[i].product.productName,
+                "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
+                "points":tempArray[i].points,
+                "money":tempArray[i].money,
+                "state":tempArray[i].state,  
+                "stateName":this.stateName(tempArray[i].state),                                              
+                "sales":tempArray[i].createdByUser && tempArray[i].createdByUser.employee &&
+                         tempArray[i].createdByUser.employee.name,
+                "comment":tempArray[i].comment,
+              });
+            }
         }
         this.setState({
             loading:false,

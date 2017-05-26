@@ -1,7 +1,142 @@
 import React from 'react';
-import { Table,Icon,Button,Modal,Form,Input,Select,Popconfirm,Tooltip} from 'antd';
+import { Table,Icon,Button,Modal,Form,Input,InputNumber,Select,Popconfirm,Tooltip,DatePicker} from 'antd';
 import {fetch,fetch2,getAfterSalesPager} from '../../utils/connect';
+
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 5 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 15 },
+  },
+};
+const FormItem = Form.Item;
+const Option = Select.Option;
 const Search = Input.Search;
+class EditModalForm extends React.Component {
+
+  state={
+    loading:false,
+  }
+    //确认编辑数据后的回调
+  onComplate=(data)=>{
+    this.setState({
+      loading:false,
+    });
+    this.props.handleEditCancel();
+    this.props.form.resetFields();
+    if(data === null){
+      Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+      return;    
+      };
+      if(data.errorCode !== 0){
+          Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+          return;
+      }
+        //成功拿到数据
+        //表格重新加载数据
+        this.props.componentDidMount();
+        Modal.success({
+              title: '成功',
+              content: '编辑伙伴成功！',
+        });
+  }
+   
+    //取消编辑 并重置表单
+  handleCancel=()=>{
+    this.props.handleEditCancel();
+    this.props.form.resetFields();
+  }
+    
+ 
+handleSubmit = (e) => {
+  e.preventDefault();
+  this.props.form.validateFields((err, values) => {
+    if (!err) {
+        
+        const  params = {
+        'company':values['company'], 
+        'key':values['key'], 
+        'money':values['money'], 
+        'serviceExpirationDate': values['serviceExpirationDate'].format('YYYY-MM-DD'),
+          };
+      console.log('Received values of form: ', params);
+
+          // let param = {
+          //   condition: {id:this.props.record.id},
+          //   entity: this.state.data
+          // }
+          // fetch2(partnerUpdate,this.onComplate,param);
+          // this.setState({
+          //   loading:true,
+          // });
+      }
+  });
+}
+ 
+ 
+
+  
+
+  render() {
+    const { getFieldDecorator } = this.props.form;
+    return (
+      <Form onSubmit={this.handleSubmit} >
+        <FormItem {...formItemLayout} label="公司名称" >
+          {getFieldDecorator('company', {
+              initialValue: this.props.record.company,
+            rules: [{ required: false, message: '请输入公司名称!' }],
+          })(
+            <Input type="text" disabled  />
+          )}
+        </FormItem>
+ 
+
+        <FormItem {...formItemLayout} label="授权码" >
+          {getFieldDecorator('key', {
+              initialValue: this.props.record.key,
+            rules: [{ required: false, message: '请输入授权码!' }],
+          })(
+            <Input type="text" disabled  />
+          )}
+        </FormItem>
+
+        <FormItem {...formItemLayout} label="服务费" >
+          {getFieldDecorator('money', {
+              initialValue: this.props.record.money,
+            rules: [{ required: true, message: '请输入收取的维护费金额!' }],
+          })(
+            <InputNumber placeholder="请输入收取的维护费金额" />
+          )}
+        </FormItem>
+
+        <FormItem {...formItemLayout} label="服务到期时间" >
+          {getFieldDecorator('serviceExpirationDate', {
+            rules: [{ type: 'object', required: true, message: '请选择服务到期日期!' }]
+          })(
+            <DatePicker/>
+          )}
+        </FormItem>
+
+         
+        <br />
+        <FormItem>
+        <div style={{textAlign:"center"}}>
+          <Button style={{width:"110px",marginRight:"10px"}} onClick={this.handleCancel}>取消</Button>
+          <Button type="dashed" style={{width:"110px",marginRight:"10px"}}
+                  onClick={()=>{this.props.form.resetFields();this.setState({data:{}});}}>重置</Button>
+          <Button type="primary" loading={this.state.loading} htmlType="submit"  style={{width:"110px"}}>确定</Button>          
+        </div>  
+        </FormItem>
+
+      </Form>
+    );
+  }
+}
+
+const WrapEditModalForm = Form.create()(EditModalForm);
 class ServiceChargeManager extends React.Component {
     constructor(props) { super(props); }
 
@@ -17,7 +152,12 @@ class ServiceChargeManager extends React.Component {
                 total:0, //总行数
                 showQuickJumper:true, //可快速跳转到指定页码
                 pageSizeOptions:['10','50','200','500','1000']//每页可显示多少行
-            }
+            }, //分页器
+        editModal:{
+                visibleEdit:false, //编辑按钮  模态框 是否可见        
+                loadingEdit:false,     
+                data:{},//待编辑行对象                                                                   
+            }, 
       
     };
 
@@ -58,7 +198,7 @@ class ServiceChargeManager extends React.Component {
           if(tempArray[i].ifCanClaim === 1){
             sourceData.unshift({ 
                 "serial":i+1,
-                "license":tempArray[i].key,
+                "key":tempArray[i].key,
                 "userNumber":tempArray[i].userNumber,
                 "product":tempArray[i].product && tempArray[i].product.productName,
                 "company":tempArray[i].customer && tempArray[i].customer.company,
@@ -77,7 +217,7 @@ class ServiceChargeManager extends React.Component {
           }else{
             sourceData.push({ 
                 "serial":i+1,
-                "license":tempArray[i].key,
+                "key":tempArray[i].key,
                 "userNumber":tempArray[i].userNumber,
                 "product":tempArray[i].product && tempArray[i].product.productName,
                 "company":tempArray[i].customer && tempArray[i].customer.company,
@@ -108,20 +248,71 @@ class ServiceChargeManager extends React.Component {
         // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
         fetch(getAfterSalesPager,this.callbackDate,{pageNO:1,pageSize:10,ifGetCount:1});
     }
-    
-    
+   
+   
+  
     onSearchCustomer=(value)=>{
         fetch(getAfterSalesPager,this.callbackDate,{pageNO:1,pageSize:10,ifGetCount:1,keyword:value});
     }
 
 
+    //编辑表格行
+    editRow=(record)=>{
+        
+        let state = {...this.state.editModal};
+            state.visibleEdit=true;
+        //深拷屏
+        Object.assign(state.data,record);
+        this.setState({
+            editModal:state,
+        });
+    }
+  
+    handleEditCancel=()=>{
+        let state = {...this.state.editModal};
+            state.visibleEdit=false;
+            state.loadingEdit=false;            
+        this.setState({
+            editModal:state,
+        });
+    }    
+
+     //删除表格行
+    enableRow=(record)=>{
+        let state = {...this.state.deleteModal};
+            state.visibleDelete=true;
+            //深拷屏
+            Object.assign(state.data,record);
+        this.setState({
+            deleteModal:state,
+        });
+    }
+    //启用禁用伙伴行回调
+    enableDisableUpdate=(data)=>{
+      if(data === null){
+        Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+        return;    
+        };
+      if(data.errorCode !== 0){
+            Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+            return;
+        }
+        //成功拿到数据
+            //表格重新加载数据
+            this.componentDidMount();
+            Modal.success({
+                  title: '成功',
+                  content: '当前操作成功！',
+                });
+    }
+     
 
 
     render() {
          //伙伴表 字段
         const Columns = [{
           title: '授权码',
-          dataIndex: 'license',
+          dataIndex: 'key',
         }, {
           title: '产品',
           dataIndex: 'product',
@@ -152,6 +343,14 @@ class ServiceChargeManager extends React.Component {
         }, {
           title: '是否可收取',
           dataIndex: 'ifCanClaimName',
+        },{
+          title: '操作',
+          dataIndex: 'edit',
+          render: (text, record, index) => {
+                  return (
+                    <a onClick={()=>this.editRow(record)}>更新记录</a> 
+                  );
+              }, 
         }];
 
         return (
@@ -173,6 +372,19 @@ class ServiceChargeManager extends React.Component {
                 loading={this.state.loading}        //Table.loading：页面是否加载中
                 onChange={this.handleTableChange}  //Table.onChange：分页、排序、筛选变化时触发
             />
+             <Modal
+              visible={this.state.editModal.visibleEdit}
+              title="修改伙伴"
+              //onOk={this.handleEditOk}
+              onCancel={this.handleEditCancel}
+              footer={null}
+            >
+               <WrapEditModalForm record={this.state.editModal.data} 
+                                  handleEditCancel={this.handleEditCancel} 
+                                  componentDidMount={this.componentDidMount}
+                                 />
+            </Modal>
+ 
             </div>);
     }
 }

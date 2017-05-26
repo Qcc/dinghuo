@@ -103,7 +103,8 @@ class AgencyPriceApproval extends React.Component {
         let tempArray = data.entity.list;
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
-            sourceData.push({ 
+            if(tempArray[i].state !== 0){
+              sourceData.push({ 
                 "serial":i+1,
                 "id":tempArray[i].partner && tempArray[i].partner.id,
                 "company":tempArray[i].partner && tempArray[i].partner.company,
@@ -115,6 +116,20 @@ class AgencyPriceApproval extends React.Component {
                 "status":state(tempArray[i].state),
                 "state":tempArray[i].state,                
             });
+            }else{
+                sourceData.unshift({ 
+                "serial":i+1,
+                "id":tempArray[i].partner && tempArray[i].partner.id,
+                "company":tempArray[i].partner && tempArray[i].partner.company,
+                "productName":tempArray[i].product && tempArray[i].product.productName,
+                "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
+                "productId":tempArray[i].product && tempArray[i].product.productId,                
+                "value":tempArray[i].value,               
+                "balance":tempArray[i].partner && tempArray[i].partner.balance,                
+                "status":state(tempArray[i].state),
+                "state":tempArray[i].state,                
+            });
+            }
         }
         this.setState({
             loading:false,

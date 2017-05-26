@@ -219,7 +219,26 @@ class PendingOrdersSales extends React.Component{
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
             if(tempArray[i].state === 4) continue;
-            sourceData.push({ 
+            if(tempArray[i].state === 3){
+              sourceData.unshift({ 
+                "serial":i+1,
+                "id":tempArray[i].id,
+                "createDatetime":tempArray[i].createDatetime,
+                "orderTypeName":this.orderTypeName(tempArray[i].orderType),
+                "orderType":tempArray[i].orderType,                
+                "company":tempArray[i].partner && tempArray[i].partner.company || 
+                          tempArray[i].customer && tempArray[i].customer.company,
+                "productName":tempArray[i].product && tempArray[i].product.productName,
+                "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
+                "points":tempArray[i].points,
+                "money":tempArray[i].money,
+                "state":tempArray[i].state,  
+                "stateName":this.stateName(tempArray[i].state),                                              
+                "sales":tempArray[i].createdByUser && tempArray[i].createdByUser.employee &&
+                         tempArray[i].createdByUser.employee.name,
+              });
+            }else{
+                sourceData.push({ 
                 "serial":i+1,
                 "id":tempArray[i].id,
                 "createDatetime":tempArray[i].createDatetime,
@@ -236,6 +255,7 @@ class PendingOrdersSales extends React.Component{
                 "sales":tempArray[i].createdByUser && tempArray[i].createdByUser.employee &&
                          tempArray[i].createdByUser.employee.name,
             });
+            }
         }
         this.setState({
             loading:false,
@@ -316,7 +336,7 @@ class PendingOrdersSales extends React.Component{
     }
     
         //成功拿到数据
-            message.success('发货成功');
+            message.success('操作成功');
             this.componentDidMount();
          
     }
@@ -340,8 +360,9 @@ class PendingOrdersSales extends React.Component{
                         </Popconfirm>*/}
                         </div> ;
             case 3:
-                return <Popconfirm title="您确认要给该代理商发货吗?"  onConfirm={this.confirmDelivery} okText="确认发货" cancelText="不发货">
-                            <a onClick={()=>this.saveRow(record)}>发货</a>
+                return <Popconfirm title={record.orderType===3?"您确认要给该代理商充值吗?":"您确认要给该代理商发货吗?"}  
+                            onConfirm={this.confirmDelivery} okText="确认" cancelText="取消">
+                            <a onClick={()=>this.saveRow(record)}>{record.orderType===3?"充值":"发货"}</a>
                         </Popconfirm> ;
         }
     }

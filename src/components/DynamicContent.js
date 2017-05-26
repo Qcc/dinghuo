@@ -9,6 +9,7 @@ import CustomerManagerAdmin from './content/CustomerManagerAdmin';
 import AgencyPriceManager from './content/AgencyPriceManager';
 import TrailLicenseManager from './content/TrailLicenseManager';
 import ServiceChargeManager from './content/ServiceChargeManager';
+import ServiceChargeManagerAdmin from './content/ServiceChargeManagerAdmin';
 import PendingOrdersFinance from './content/PendingOrdersFinance';
 import HistoryOrders from './content/HistoryOrders';
 import AgencyPriceApproval from './content/AgencyPriceApproval';
@@ -133,7 +134,7 @@ class DynamicContent extends React.Component {
                 return <HistoryOrders/>; 
             case 'TrailLicenseManager':   //临时授权-销售-财务-管理员
                 return <TrailLicenseManager/>;
-            case 'ServiceChargeManager': //维护费-销售-财务-技术-管理员 
+            case 'ServiceChargeManager': //维护费-销售-技术
                 return <ServiceChargeManager/>;
             //财务模块  
             case 'PartnerManager_finance':    //渠道伙伴-财务-管理员
@@ -146,6 +147,8 @@ class DynamicContent extends React.Component {
                 return <PendingOrdersFinance/>;
             case 'HistoryOrders':           //历史订单-财务-管理员
                 return <HistoryOrders/>;
+            case 'ServiceChargeManager_admin': //维护费-销售-技术
+                return <ServiceChargeManagerAdmin/>;
             //管理员
             case 'PartnerManager_admin' :  //伙伴管理-财务-管理员
                 return  <PartnerManagerAdmin/>;

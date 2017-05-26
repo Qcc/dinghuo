@@ -123,6 +123,8 @@ export const generateTrail = ROOTURL +"/protected/license/generateTrail.api";
 export const addUserNumberAndDelay = ROOTURL+"/protected/license/addUserNumberAndDelay.api";
 //临时license 获取还可延期的天数
 export const getSumDelayDays = ROOTURL+"/protected/license/getSumDelayDays.api";
+//售后服务
+export const getAfterSalesPager = ROOTURL+"/protected/license/getAfterSalesPager.api";
 
 //员工管理
 export const employeeCreate = ROOTURL+"/protected/employee/create.api";
