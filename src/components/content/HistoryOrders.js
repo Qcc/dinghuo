@@ -30,7 +30,7 @@ class HistoryOrders extends React.Component{
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:pager.current,size:pager.pageSize,ifGetCount:1}
-        fetch(orderGetPager,this.callbackDate);
+        fetch(orderGetPager,this.callbackDate,{pageNO:pager.current,pageSize:pager.pageSize,ifGetCount:1});
     }
 
     stateName=(state)=>{
@@ -117,7 +117,7 @@ class HistoryOrders extends React.Component{
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
-        fetch(orderGetPager,this.callbackDate);
+        fetch(orderGetPager,this.callbackDate,{pageNO:1,pageSize:10,ifGetCount:1});
     }
 
     render() {

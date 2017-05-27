@@ -28,7 +28,7 @@ export function fetch(url,onComplete,params = {},method='POST'){
     })
     .then((data) => {
         if(data.status === 200){
-            console.log("成功获取到数据 ",JSON.stringify(data,null,4));
+            // console.log("成功获取到数据 ",JSON.stringify(data,null,4));
             onComplete(data);
         }else{
             onComplete(null);          
@@ -45,7 +45,7 @@ export function fetch(url,onComplete,params = {},method='POST'){
 export function fetch2(url,onComplete,params = {},method='POST'){
      console.log("调用了fecth =",'url',url,'method',method,'params:', params);
     if(typeof onComplete !== 'function'){
-        console.log("成功获取到数据,回调函数不正确",onComplete);
+        // console.log("成功获取到数据,回调函数不正确",onComplete);
         return;
     }
     reqwest({
@@ -141,9 +141,9 @@ export const customerDelete = ROOTURL + "/protected/customer/delete.api";
 export const customerGetPager = ROOTURL + "/protected/customer/getPager.api";
 
 //维护费管理
-export const serviceCreate = ROOTURL + "/protected/customerservicecharge/create.api";
-export const serviceUpdate = ROOTURL + "/protected/customerservicecharge/update.api";
-export const serviceDelete = ROOTURL + "/protected/customerservicecharge/delete.api";
+export const serviceCreate = ROOTURL + "/protected/customerServiceCharge/create.api";
+export const serviceUpdate = ROOTURL + "/protected/customerServiceCharge/update.api";
+export const serviceDelete = ROOTURL + "/protected/customerServiceCharge/delete.api";
 export const serviceGetPager = ROOTURL + "/protected/customerServiceCharge/getPager.api";
 //现金库存管理
 export const rechargeCreate = ROOTURL + "/protected/recharge/create.api";

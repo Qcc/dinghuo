@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table,Icon,Button,Modal,Form,Input,InputNumber,Select,Popconfirm,Tooltip,DatePicker} from 'antd';
-import {fetch,fetch2,getAfterSalesPager} from '../../utils/connect';
+import {fetch,fetch2,getAfterSalesPager,serviceCreate} from '../../utils/connect';
 
 const formItemLayout = {
   labelCol: {
@@ -40,40 +40,35 @@ class EditModalForm extends React.Component {
         this.props.componentDidMount();
         Modal.success({
               title: '成功',
-              content: '编辑伙伴成功！',
+              content: '更新服务费记录成功！',
         });
   }
    
     //取消编辑 并重置表单
   handleCancel=()=>{
+    console.log("111");
     this.props.handleEditCancel();
     this.props.form.resetFields();
   }
-    
+  
  
 handleSubmit = (e) => {
   e.preventDefault();
   this.props.form.validateFields((err, values) => {
     if (!err) {
-        
         const  params = {
-        'company':values['company'], 
-        'key':values['key'], 
+        'customer.id': values['customerID'],
+        'license':values['license'], 
         'money':values['money'], 
         'serviceExpirationDate': values['serviceExpirationDate'].format('YYYY-MM-DD'),
           };
-      console.log('Received values of form: ', params);
-
-          // let param = {
-          //   condition: {id:this.props.record.id},
-          //   entity: this.state.data
-          // }
-          // fetch2(partnerUpdate,this.onComplate,param);
-          // this.setState({
-          //   loading:true,
-          // });
+          fetch(serviceCreate,this.onComplate,params);
+          this.setState({
+            loading:true,
+          });
       }
   });
+  this.props.form.resetFields();      
 }
  
  
@@ -84,6 +79,15 @@ handleSubmit = (e) => {
     const { getFieldDecorator } = this.props.form;
     return (
       <Form onSubmit={this.handleSubmit} >
+        <FormItem {...formItemLayout}   >
+          {getFieldDecorator('customerID', {
+              initialValue: this.props.record.customerID,
+            rules: [{ required: false, message: '' }],
+          })(
+            <input type="hidden" disabled="disabled"  />
+          )}
+        </FormItem>
+
         <FormItem {...formItemLayout} label="公司名称" >
           {getFieldDecorator('company', {
               initialValue: this.props.record.company,
@@ -95,9 +99,17 @@ handleSubmit = (e) => {
  
 
         <FormItem {...formItemLayout} label="授权码" >
-          {getFieldDecorator('key', {
-              initialValue: this.props.record.key,
+          {getFieldDecorator('license', {
+              initialValue: this.props.record.license,
             rules: [{ required: false, message: '请输入授权码!' }],
+          })(
+            <Input type="text" disabled  />
+          )}
+        </FormItem>
+        <FormItem {...formItemLayout} label="站点数" >
+          {getFieldDecorator('userNumber', {
+              initialValue: this.props.record.userNumber,
+            rules: [{ required: false, message: '请输入站点数!' }],
           })(
             <Input type="text" disabled  />
           )}
@@ -198,7 +210,7 @@ class ServiceChargeManager extends React.Component {
           if(tempArray[i].ifCanClaim === 1){
             sourceData.unshift({ 
                 "serial":i+1,
-                "key":tempArray[i].key,
+                "license":tempArray[i].key,
                 "userNumber":tempArray[i].userNumber,
                 "product":tempArray[i].product && tempArray[i].product.productName,
                 "company":tempArray[i].customer && tempArray[i].customer.company,
@@ -217,7 +229,7 @@ class ServiceChargeManager extends React.Component {
           }else{
             sourceData.push({ 
                 "serial":i+1,
-                "key":tempArray[i].key,
+                "license":tempArray[i].key,
                 "userNumber":tempArray[i].userNumber,
                 "product":tempArray[i].product && tempArray[i].product.productName,
                 "company":tempArray[i].customer && tempArray[i].customer.company,
@@ -252,7 +264,9 @@ class ServiceChargeManager extends React.Component {
    
   
     onSearchCustomer=(value)=>{
+      if(value){
         fetch(getAfterSalesPager,this.callbackDate,{pageNO:1,pageSize:10,ifGetCount:1,keyword:value});
+      }
     }
 
 
@@ -312,7 +326,7 @@ class ServiceChargeManager extends React.Component {
          //伙伴表 字段
         const Columns = [{
           title: '授权码',
-          dataIndex: 'key',
+          dataIndex: 'license',
         }, {
           title: '产品',
           dataIndex: 'product',
@@ -348,7 +362,7 @@ class ServiceChargeManager extends React.Component {
           dataIndex: 'edit',
           render: (text, record, index) => {
                   return (
-                    <a onClick={()=>this.editRow(record)}>更新记录</a> 
+                    <a onClick={()=>this.editRow(record)}>收维护费</a> 
                   );
               }, 
         }];

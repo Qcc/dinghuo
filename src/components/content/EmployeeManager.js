@@ -484,7 +484,7 @@ class EmployeeManager extends React.Component {
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:pager.current,size:pager.pageSize,ifGetCount:1}
-        fetch(employeeGetPager,this.callbackDate,{pageNO:pager.current,size:pager.pageSize,ifGetCount:1});
+        fetch(employeeGetPager,this.callbackDate,{pageNO:pager.current,pageSize:pager.pageSize,ifGetCount:1});
     }
     
     //获取数据后映射到 table state

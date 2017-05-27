@@ -347,7 +347,7 @@ class ProductManager extends React.Component {
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:pager.current,size:pager.pageSize,ifGetCount:1}
-        fetch(productGetPager,this.callbackDate,{pageNO:pager.current,size:pager.pageSize,ifGetCount:1});
+        fetch(productGetPager,this.callbackDate,{pageNO:pager.current,pageSize:pager.pageSize,ifGetCount:1});
     }
    
 

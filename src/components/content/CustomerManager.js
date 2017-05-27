@@ -158,7 +158,7 @@ class CustomerManager extends React.Component {
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:pager.current,size:pager.pageSize,ifGetCount:1}
-        fetch(partnerGetPager,this.callbackDate,{pageNO:pager.current,size:pager.pageSize,ifGetCount:1});
+        fetch(partnerGetPager,this.callbackDate,{pageNO:pager.current,pageSize:pager.pageSize,ifGetCount:1});
     }
    
 
@@ -208,7 +208,7 @@ class CustomerManager extends React.Component {
     //首次加载组件 获取数据
     componentDidMount=()=>{
         // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
-        fetch(customerGetPager,this.callbackDate,{pageNO:1,size:10,ifGetCount:1});
+        fetch(customerGetPager,this.callbackDate,{pageNO:1,pageSize:10,ifGetCount:1});
     }
     //新建伙伴
     createNewItem=()=>{

@@ -35,8 +35,11 @@ class CreateOrder extends React.Component{
            customerIdValid:"",
            customerIdHelp:"",           
            moneyValid:"",
-           moneyHelp:"", 
+           moneyHelp:"",
+           licenseValid:"",
+           licenseHelp:"",
            //表单数据
+           license:"",
            partner:"",
            points:"",
            product:"",
@@ -162,6 +165,17 @@ class CreateOrder extends React.Component{
         submit:false,        
      });
     }
+   handleLicenseChange=(e)=>{
+       let state = {...this.state.data}
+     state.license=e.target.value;
+     this.setState({
+         license:e.target.value,
+        data:state,
+        licenseValid:"",
+        licenseHelp:"", 
+        submit:false,        
+     });
+   }
     //设置备注
   onCommentChange=(e)=>{
      let state = {...this.state.data}
@@ -185,14 +199,11 @@ class CreateOrder extends React.Component{
         Modal.error({title: '错误！',content:'服务器错误,'+data.message});
         return;
     }
-     
         //成功拿到数据
         Modal.success({
               title: '成功',
               content: '创建订单成功！等待财务审核。',
         });
-        
-     
     }
     handleSubmit=(e)=>{
         e.preventDefault();
@@ -204,38 +215,79 @@ class CreateOrder extends React.Component{
             return;
         }
         let flag=true;
-        if(!this.state.data.partner && this.state.orderType !== "customerOrder"){
-            this.setState({
-                partnerIdValid:"error",
-                partnerIdHelp:"客户公司名称不能为空", 
-            });
-            flag=false;
-        }
-        if(!this.state.data.points && this.state.orderType !== "partnerCashOrder"){
-            this.setState({
-                pointsValid:"error",
-                pointsHelp:"站点数不能为空", 
-            });
-            flag=false;
+        if(this.state.orderType === "partnerOrder" ){
+            if(!this.state.data.partner){
+                this.setState({
+                    partnerIdValid:"error",
+                    partnerIdHelp:"客户公司名称不能为空", 
+                });
+                flag=false;
+            }
+            if(!this.state.data.product && this.state.orderType !== "partnerCashOrder"){
+                this.setState({
+                    productIdValid:"error",
+                    productIdHelp:"请选择产品！", 
+                });
+                flag=false;
+            }
+            if(!this.state.data.points && this.state.orderType !== "partnerCashOrder"){
+                this.setState({
+                    pointsValid:"error",
+                    pointsHelp:"站点数不能为空", 
+                });
+                flag=false;
+            }
+        }else if(this.state.orderType ==="partnerCashOrder"){
+                if(!this.state.data.partner){
+                this.setState({
+                    partnerIdValid:"error",
+                    partnerIdHelp:"客户公司名称不能为空", 
+                });
+                flag=false;
+            }
+        }else if(this.state.orderType === "customerOrder"){
+                if(!this.state.data.customer){
+                    this.setState({
+                        customerIdValid:"error",
+                        customerIdHelp:"请选择终端客户！", 
+                    });
+                    flag=false;
+                }
+                if(!this.state.data.product && this.state.orderType !== "partnerCashOrder"){
+                this.setState({
+                    productIdValid:"error",
+                    productIdHelp:"请选择产品！", 
+                });
+                flag=false;
+                }
+                if(!this.state.data.points && this.state.orderType !== "partnerCashOrder"){
+                    this.setState({
+                        pointsValid:"error",
+                        pointsHelp:"站点数不能为空", 
+                    });
+                    flag=false;
+                }
+
+        }else if(this.state.orderType === "customerAddOrder"){
+                if(!this.state.data.license && this.state.orderType === "customerAddOrder"){
+                    this.setState({
+                        licenseValid:"error",
+                        licenseHelp:"请输入授权码！", 
+                    });
+                    flag=false;
+                }
+                if(!this.state.data.points && this.state.orderType !== "partnerCashOrder"){
+                    this.setState({
+                        pointsValid:"error",
+                        pointsHelp:"站点数不能为空", 
+                    });
+                    flag=false;
+                }
         }
         if(!this.state.data.money){
             this.setState({
                 moneyValid:"error",
                 moneyHelp:"金额不能为空", 
-            });
-            flag=false;
-        }
-        if(!this.state.data.product && this.state.orderType !== "partnerCashOrder"){
-            this.setState({
-                productIdValid:"error",
-                productIdHelp:"请选择产品！", 
-            });
-            flag=false;
-        }
-        if(!this.state.data.customer && this.state.orderType === "customerOrder"){
-            this.setState({
-                customerIdValid:"error",
-                customerIdHelp:"请选择终端客户！", 
             });
             flag=false;
         }
@@ -383,7 +435,36 @@ class CreateOrder extends React.Component{
                 </FormItem>
                 </div>
             );
-        }   
+        } else if(this.state.orderType === "customerAddOrder"){
+            return(
+                <div>
+                <FormItem
+                  {...formItemLayout}
+                  label="授权码"
+                  hasFeedback
+                  required
+                  validateStatus={this.state.licenseValid}
+                  help={this.state.licenseHelp}
+                >
+                    <Input onChange={this.handleLicenseChange} value={this.state.license}   style={{ width: 200 }}  />
+                </FormItem>
+            
+                <FormItem
+                  {...formItemLayout}
+                  label="增加站点数"
+                  hasFeedback
+                  required
+                  validateStatus={this.state.pointsValid}
+                  help={this.state.pointsHelp}
+                >
+                  <InputNumber onChange={this.handlePointsChange} value={this.state.points} min={1}   />
+                  <Tooltip title="请填入需要增加的站点数，原授权会自动增加相应的站点">
+                                <Icon type="question-circle-o" />
+                              </Tooltip>
+                </FormItem>
+                </div>
+            );
+        }
     }  
 
     render(){
@@ -397,6 +478,7 @@ class CreateOrder extends React.Component{
                      <Radio.Button value="partnerOrder">伙伴订货</Radio.Button>
                      <Radio.Button value="partnerCashOrder">伙伴压款</Radio.Button>
                      <Radio.Button value="customerOrder">直销客户</Radio.Button>
+                     <Radio.Button value="customerAddOrder">客户加点</Radio.Button>                     
                    </Radio.Group>
                  </FormItem>
                 {this.dynamicForm()}

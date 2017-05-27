@@ -40,7 +40,7 @@ class AgencyPriceManager extends React.Component {
         this.setState({
             pagination: pager,
         });
-        fetch(priceGetPager,this.priceUpdate,{pageNO:pager.current,size:pager.size,ifGetCount:1});
+        fetch(priceGetPager,this.priceUpdate,{pageNO:pager.current,pageSize:pager.size,ifGetCount:1});
     }
 
     //编辑表格行
@@ -128,7 +128,7 @@ class AgencyPriceManager extends React.Component {
     }
 
     componentDidMount=()=>{
-        fetch(priceGetPager,this.priceUpdate,{pageNO:1,size:10,ifGetCount:1});
+        fetch(priceGetPager,this.priceUpdate,{pageNO:1,pageSize:10,ifGetCount:1});
     }
 
 

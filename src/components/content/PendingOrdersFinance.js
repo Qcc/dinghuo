@@ -80,6 +80,15 @@ class EditModalForm extends React.Component {
                      </Select>
                     )}
         </FormItem>}
+        {this.props.record.orderType ===4?
+        <FormItem {...formItemLayout} label="授权码" >
+          {getFieldDecorator('license', {
+              initialValue: this.props.record.license,
+            rules: [{ required: false, message: '' }],
+          })(
+            <Input disabled type="text" />
+          )}
+        </FormItem>:''}
         {this.props.record.orderType ===3?"":
         <FormItem {...formItemLayout} label="站点数" >
           {getFieldDecorator('points', {
@@ -101,7 +110,7 @@ class EditModalForm extends React.Component {
 
         <FormItem {...formItemLayout} required label="审核" >
              {getFieldDecorator('state', {
-            rules: [{ required: false, message: '请选择是确认价格，确认选通过，不确认选不通过。' }],
+            rules: [{ required: true, message: '请选择，确认选通过，不确认选不通过。' }],
           })(
              <RadioGroup >
                <Radio value={1}>通过</Radio>
@@ -227,7 +236,7 @@ class PendingOrdersFinance extends React.Component{
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:pager.current,size:pager.pageSize,ifGetCount:1}
-        fetch(orderGetPager,this.callbackDate);
+        fetch(orderGetPager,this.callbackDate,{pageNO:pager.current,pageSize:pager.pageSize,state:+filters.stateName[0],ifGetCount:1});
     }
 
     stateName=(state)=>{
@@ -255,6 +264,8 @@ class PendingOrdersFinance extends React.Component{
             break;
             case 3:s='伙伴压款';
             break;
+            case 4:s='老客户加点';
+            break;
             default:s='无';
         }
         return s;
@@ -280,15 +291,13 @@ class PendingOrdersFinance extends React.Component{
         let tempArray = data.entity.list;
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
-            if(tempArray[i].state === 4) continue;
-            if(tempArray[i].state === 1 || tempArray[i].state === 2){
               sourceData.unshift({ 
                 "serial":i+1,
                 "id":tempArray[i].id,
                 "createDatetime":tempArray[i].createDatetime,
-                "orderType":tempArray[i].orderType,
                 "orderTypeName":this.orderTypeName(tempArray[i].orderType),
                 "orderType":tempArray[i].orderType,
+                "license":tempArray[i].license,
                 "company":tempArray[i].partner&& tempArray[i].partner.company || 
                           tempArray[i].customer && tempArray[i].customer.company,
                 "productName":tempArray[i].product && tempArray[i].product.productName,
@@ -301,27 +310,6 @@ class PendingOrdersFinance extends React.Component{
                          tempArray[i].createdByUser.employee.name,
                 "comment":tempArray[i].comment,
               });
-            }else{
-              sourceData.push({ 
-                "serial":i+1,
-                "id":tempArray[i].id,
-                "createDatetime":tempArray[i].createDatetime,
-                "orderType":tempArray[i].orderType,
-                "orderTypeName":this.orderTypeName(tempArray[i].orderType),
-                "orderType":tempArray[i].orderType,
-                "company":tempArray[i].partner&& tempArray[i].partner.company || 
-                          tempArray[i].customer && tempArray[i].customer.company,
-                "productName":tempArray[i].product && tempArray[i].product.productName,
-                "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
-                "points":tempArray[i].points,
-                "money":tempArray[i].money,
-                "state":tempArray[i].state,  
-                "stateName":this.stateName(tempArray[i].state),                                              
-                "sales":tempArray[i].createdByUser && tempArray[i].createdByUser.employee &&
-                         tempArray[i].createdByUser.employee.name,
-                "comment":tempArray[i].comment,
-              });
-            }
         }
         this.setState({
             loading:false,
@@ -337,7 +325,7 @@ class PendingOrdersFinance extends React.Component{
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
-        fetch(orderGetPager,this.callbackDate);
+        fetch(orderGetPager,this.callbackDate,{pageNO:1,pageSize:10,ifGetCount:1});
     }
     //编辑表格行
     editRow=(record)=>{
@@ -427,6 +415,23 @@ class PendingOrdersFinance extends React.Component{
         }, {
           title: '状态',
           dataIndex: 'stateName',
+          filters: [{
+                  text: '待发货',
+                  value: 3,
+                },{
+                  text: '待审核',
+                  value: 1,
+                },{
+                  text: '待付款',
+                  value: 2,
+                },{
+                  text: '已完成',
+                  value: 4,
+                },{
+                  text: '审核不通过',
+                  value: -2,
+                }],
+                filterMultiple: false,
         }, {
           title: '销售',
           dataIndex: 'sales',

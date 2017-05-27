@@ -117,7 +117,6 @@ class DynamicContent extends React.Component {
 
     dynamicContent() {
         let menuItem =this.state.menuKey;
-        console.log("=================",menuItem,"===============");
         switch(menuItem){
             //销售模块
             case 'PartnerManager_sales' :    //伙伴管理-销售
@@ -139,8 +138,8 @@ class DynamicContent extends React.Component {
             //财务模块  
             case 'PartnerManager_finance':    //渠道伙伴-财务-管理员
                 return <PartnerManagerAdmin/>;
-            // case 'CustomerManager_finance':    //直销客户-财务-管理员 
-            //     return <CustomerManagerAdmin/>;
+             case 'CustomerManager_finance':    //直销客户-财务-管理员 
+                return <CustomerManagerAdmin/>;
             case 'AgencyPriceApproval_finance': //伙伴价格审核-财务-管理员
                 return <AgencyPriceApproval/>;
             case 'PendingOrders_Finance':   //待处理订单-财务-管理员

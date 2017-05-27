@@ -15,6 +15,57 @@ const formItemLayout = {
 };
 const FormItem = Form.Item;
 const Option = Select.Option;
+
+
+//复制申请的授权码，小按钮
+class CopyIcon extends React.Component{
+    state={
+        product:this.props.cdk.product?this.props.cdk.product.productName:'null',
+        cdk:this.props.cdk.key,
+        number:this.props.cdk.userNumber,
+        trail:this.props.cdk.isTrail === 1?'临时授权':'正版授权',
+        date:this.props.cdk.expirationDate,
+        copy:'复制授权',
+        icon:'copy',
+    }
+    //props参数校验
+    static propTypes = {
+        cdk: React.PropTypes.object.isRequired,
+    };
+    handleCopy=(e)=>{
+      var txt=document.getElementById("cdkey");
+      txt.select(); // 选择对象
+      document.execCommand("Copy"); // 执行浏览器复制命令
+      this.setState({
+          copy:'已复制',
+          icon:'check',
+        });
+    }
+    handleMoseOut=()=>{
+      this.setState({
+        copy:'复制授权',
+        icon:'copy',        
+      });
+    }
+
+    render(){
+      return(
+           <div  onMouseOut={this.handleMoseOut} style={{textAlign:"center",position:"relative"}}>
+              <Input  type="textarea" cols="20" rows="5" id="cdkey" 
+                  value={
+                 "适用产品:"+this.state.product +
+                  "\n授权码:"+this.state.cdk +
+                  "\n用户数:"+this.state.number +
+                  "\n类型:"+this.state.trail +
+                  "\n过期时间:"+this.state.date
+                }/>
+                <Button style={{position:"absolute",right:"10px",top:"10px",color:"#00a854"}} 
+                        type="dashed" ghost onClick={this.handleCopy}>{this.state.copy}</Button>
+           </div>
+      );
+    }
+}
+
 class EditModalForm extends React.Component {
 
     //确认编辑数据后的回调
@@ -163,8 +214,9 @@ class PendingOrdersSales extends React.Component{
             pagination: pager,
             loading:true,
         });
+       
         // 真实api加 参数查询分页 
-        fetch(orderGetPager,this.callbackDate,{pageNO:pager.current,size:pager.pageSize,ifGetCount:1});
+        fetch(orderGetPager,this.callbackDate,{pageNO:pager.current,pageSize:pager.pageSize,state:+filters.stateName[0],ifGetCount:1});
     }
 
     stateName=(state)=>{
@@ -193,6 +245,8 @@ class PendingOrdersSales extends React.Component{
             break;
             case 3:s='伙伴压款';
             break;
+            case 4:s='老客户加点';
+            break;
             default:s='无';
         }
         return s;
@@ -215,11 +269,10 @@ class PendingOrdersSales extends React.Component{
         //成功拿到数据
         let pager = this.state.pagination;
             pager.total=data.entity.count;
+
         let tempArray = data.entity.list;
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
-            if(tempArray[i].state === 4) continue;
-            if(tempArray[i].state === 3){
               sourceData.unshift({ 
                 "serial":i+1,
                 "id":tempArray[i].id,
@@ -237,25 +290,7 @@ class PendingOrdersSales extends React.Component{
                 "sales":tempArray[i].createdByUser && tempArray[i].createdByUser.employee &&
                          tempArray[i].createdByUser.employee.name,
               });
-            }else{
-                sourceData.push({ 
-                "serial":i+1,
-                "id":tempArray[i].id,
-                "createDatetime":tempArray[i].createDatetime,
-                "orderTypeName":this.orderTypeName(tempArray[i].orderType),
-                "orderType":tempArray[i].orderType,                
-                "company":tempArray[i].partner && tempArray[i].partner.company || 
-                          tempArray[i].customer && tempArray[i].customer.company,
-                "productName":tempArray[i].product && tempArray[i].product.productName,
-                "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
-                "points":tempArray[i].points,
-                "money":tempArray[i].money,
-                "state":tempArray[i].state,  
-                "stateName":this.stateName(tempArray[i].state),                                              
-                "sales":tempArray[i].createdByUser && tempArray[i].createdByUser.employee &&
-                         tempArray[i].createdByUser.employee.name,
-            });
-            }
+             
         }
         this.setState({
             loading:false,
@@ -269,8 +304,9 @@ class PendingOrdersSales extends React.Component{
         this.setState({
             loading:true,
         });
+        
         // 真实api加 参数查询分页 {pageNO:1,size:10,ifGetCount:1}
-        fetch(orderGetPager,this.callbackDate,{pageNO:1,size:10,ifGetCount:1});
+        fetch(orderGetPager,this.callbackDate,{pageNO:1,pageSize:10,ifGetCount:1});
     }
     //编辑表格行
     editRow=(record)=>{
@@ -335,10 +371,13 @@ class PendingOrdersSales extends React.Component{
         return;
     }
     
-        //成功拿到数据
-            message.success('操作成功');
+        //成功拿到数
+    if(data.entity===1){
+        Modal.success({title: '成功！',content:"发货成功，库存或授权已更新！"});        
+    }else{
+        Modal.success({title: '申请正式授权成功！',content:<CopyIcon cdk={data.entity}/>});
+    }
             this.componentDidMount();
-         
     }
     //发货
     confirmDelivery=()=>{
@@ -360,10 +399,35 @@ class PendingOrdersSales extends React.Component{
                         </Popconfirm>*/}
                         </div> ;
             case 3:
-                return <Popconfirm title={record.orderType===3?"您确认要给该代理商充值吗?":"您确认要给该代理商发货吗?"}  
+                if(record.orderType === 1){
+                    return(
+                        <Popconfirm title="您确认要给该代理商发货吗?"  
                             onConfirm={this.confirmDelivery} okText="确认" cancelText="取消">
-                            <a onClick={()=>this.saveRow(record)}>{record.orderType===3?"充值":"发货"}</a>
-                        </Popconfirm> ;
+                            <a onClick={()=>this.saveRow(record)}>发货</a>
+                        </Popconfirm>
+                    );
+                }else if(record.orderType === 2){
+                    return(
+                        <Popconfirm title="您确认要给客户申请正式授权码吗?"  
+                            onConfirm={this.confirmDelivery} okText="确认" cancelText="取消">
+                            <a onClick={()=>this.saveRow(record)}>注册</a>
+                        </Popconfirm>
+                    );
+                }else if(record.orderType === 3){
+                    return(
+                        <Popconfirm title="您确认要给该代理商充值吗?"  
+                            onConfirm={this.confirmDelivery} okText="确认" cancelText="取消">
+                            <a onClick={()=>this.saveRow(record)}>充值</a>
+                        </Popconfirm>
+                    );
+                }else if(record.orderType === 4){
+                    return(
+                        <Popconfirm title="您确认要给客户加点吗?"  
+                            onConfirm={this.confirmDelivery} okText="确认" cancelText="取消">
+                            <a onClick={()=>this.saveRow(record)}>加点</a>
+                        </Popconfirm>
+                    );
+                }
         }
     }
 
@@ -396,6 +460,23 @@ class PendingOrdersSales extends React.Component{
         }, {
           title: '状态',
           dataIndex: 'stateName',
+          filters: [{
+                  text: '待发货',
+                  value: 3,
+                },{
+                  text: '待审核',
+                  value: 1,
+                },{
+                  text: '待付款',
+                  value: 2,
+                },{
+                  text: '已完成',
+                  value: 4,
+                },{
+                  text: '审核不通过',
+                  value: -2,
+                }],
+                filterMultiple: false,
         }, {
           title: '销售',
           dataIndex: 'sales',
@@ -414,7 +495,7 @@ class PendingOrdersSales extends React.Component{
         return (
             <div>
             <Table bordered columns={Columns}
-                rowKey={record => record.id}          //Table.rowKey：表格行 key 的取值，可以是字符串或一个函数 （我的理解：给每一行一个唯一标识）
+                rowKey={record => record.serial}          //Table.rowKey：表格行 key 的取值，可以是字符串或一个函数 （我的理解：给每一行一个唯一标识）
                 dataSource={this.state.data}
                 pagination={this.state.pagination}  //Table.pagination：分页器，配置项参考 pagination，设为 false 时不展示和进行分页
                 loading={this.state.loading}        //Table.loading：页面是否加载中

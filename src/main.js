@@ -7,11 +7,12 @@ import DynamicMenu from './components/DynamicMenu.js';
 import DynamicContent from './components/DynamicContent.js';
 import DynamicBreadcrumb from './components/DynamicBreadcrumb.js';
 import KtFooter from './components/Footer.js';
-import {fetch,isLoggedIn} from './utils/connect';
+import {fetch,isLoggedIn,logoutApi} from './utils/connect';
 import styles from "./styles/main.css";
 
 
 const { Header, Content, Footer, Sider } = Layout;
+const confirm = Modal.confirm;
 const Topics = {
     Loading: 'PageLoadingStateChange',
     OnMenu: 'MenuSelectChange'
@@ -46,7 +47,9 @@ let indexURL = "http://localhost:8000/index.html";
       }); 
     };
 class IsLoggedIn extends React.Component{
-
+    state={
+        time:5,
+    }
     timer =()=> setInterval(()=>{fetch(isLoggedIn,this.isLoggedInUpdate);},600000);
     componentDidMount=()=>{
        this.timer();
@@ -54,16 +57,24 @@ class IsLoggedIn extends React.Component{
     
     isLoggedInUpdate=(data)=>{
         if(data === null){
-        Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
         return;    
         };
         if(data.errorCode !== 0){
-            Modal.error({title: '错误！',content:'服务器错误,'+data.message});
-            return;
+        return;
         }
        if(data.entity === 0){
-           Modal.error({title: '错误！',content:'当前帐号已退出，点击按钮返回主页！'});            
            clearInterval(this.timer);
+           Modal.error({title: '错误！',content:`当前帐号已退出，${this.state.time}秒后返回主页！`});            
+          let time = setInterval(()=>{
+               this.setState({
+                   time:this.state.time-1,
+               });
+               if(this.state.time<0){
+                clearInterval(time);
+                 window.location.pathname ='/index.html';  
+
+               }
+           },1000);
         } 
     }
     render(){
