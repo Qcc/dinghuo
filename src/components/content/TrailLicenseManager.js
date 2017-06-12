@@ -2,7 +2,7 @@ import React from 'react';
 import {Button,Table, Input,InputNumber,Date, 
         Icon,Modal,Form,Radio,Tooltip,Select,Cascader,
       Row, Col, Checkbox,AutoComplete } from 'antd';
-import {licenseCountPager,partnerGetPager,generateTrail,getSumDelayDays,addUserNumberAndDelay,fetch} from '../../utils/connect';
+import {licenseCountPager,partnerGetPager,customerGetPager,generateTrail,getSumDelayDays,addUserNumberAndDelay,fetch} from '../../utils/connect';
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 //修改授权码模态框
@@ -68,6 +68,7 @@ class CopyIcon extends React.Component{
 
 const Option = Select.Option;
 const children=[];
+const childrenCustomer=[];
 //申请临时授权界面
 class AskTemlLic extends React.Component{
   state = {
@@ -96,7 +97,7 @@ class AskTemlLic extends React.Component{
           loading:true,
         });
         values.productId= +values.productId;
-        values.partnerId= +values.partnerId;
+        values.partnerId= values.partnerId?+values.partnerId:null;
         fetch(generateTrail,this.getLicUpdata,values);
         this.props.formCancel();
       }
@@ -131,9 +132,36 @@ class AskTemlLic extends React.Component{
             }
     
             }
+    } 
+    customerListUpdata=(data)=>{
+    if(data === null){
+    Modal.error({title: '错误！',content:'网络错误，请刷新（F5）后重试。'});  
+    return;    
+    };
+    if(data.errorCode !== 0){
+        Modal.error({title: '错误！',content:'服务器错误,'+data.message});
+        return;
+    }
+    if(data.entity !== null){
+        //成功拿到数据
+            let list = data.entity.list;
+            for (let i = 0; i < data.entity.count; i++) {
+                childrenCustomer.push(<Option key={list[i].id}>{list[i].company}</Option>);
+            }
+    
+            }
     }
     componentDidMount=()=>{
-        fetch(partnerGetPager,this.partnerListUpdata,{pageNO:1,pageSize:1000,ifGetCount:1})
+      fetch(partnerGetPager,this.partnerListUpdata,{pageNO:1,pageSize:10000,ifGetCount:1})
+      fetch(customerGetPager,this.customerListUpdata,{pageNO:1,pageSize:10000,ifGetCount:1})      
+    }
+    handlePartnerChange=(value)=>{
+      console.log(value);
+      childrenCustomer.length=0;      
+      fetch(customerGetPager,this.customerListUpdata,{pageNO:1,pageSize:10000,ifGetCount:1,'partner.id':+value})            
+    }
+    handleCustomerChange=(value)=>{
+      console.log(value);      
     }
 
   render() {
@@ -178,7 +206,6 @@ class AskTemlLic extends React.Component{
         <FormItem
           {...formItemLayout}
           label="产品"
-          hasFeedback
         >
           {getFieldDecorator('productId', {
             rules: [{
@@ -228,10 +255,10 @@ class AskTemlLic extends React.Component{
         <FormItem
           {...formItemLayout}
           label="代理商"
-          hasFeedback
         >
           {getFieldDecorator('partnerId', {
-            rules: [{ required: true, message: '请选择代理商!' }],
+                  initialValue:"",            
+            rules: [{ required: false, message: '请选择代理商!' }],
           })(
             <Select
                        showSearch
@@ -246,48 +273,25 @@ class AskTemlLic extends React.Component{
         </FormItem>
         <FormItem
           {...formItemLayout}
-          label="用户公司"
+          label="用户"
         >
           {getFieldDecorator('endUserCompany', {
             rules: [{required: true, message: '请输入终端用户公司名称!' }],
           })(
-            <Input  />
+            <Select
+                       showSearch
+                       style={{ width: 200 }}
+                       style={{ width: '100%' }}
+                       onChange={this.handleCustomerChange}
+                       filterOption={(value, option) => option.props.childrenCustomer.indexOf(value)!=-1}
+                     >
+                       {childrenCustomer}
+              </Select>
           )}
-        </FormItem>
-
-        <FormItem
-          {...formItemLayout}
-          label="用户联系人"
-        >
-          {getFieldDecorator('endUserName', {
-            rules: [{ required: true, message: '请输入终端用户联系人!' }],
-          })(
-            <Input  style={{width:"200px"}} />
-          )}
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="用户邮箱"
-        >
-          {getFieldDecorator('endUserEmail', {
-            rules: [{ required: true, message: '请输入终端用户邮箱!' }],
-          })(
-              <Input style={{width:"200px"}} />
-          )}
-        </FormItem>
-        <FormItem
-          {...formItemLayout}
-          label="用户手机"
-        >
-              {getFieldDecorator('endUserPhone', {
-                rules: [{ required: true, message: '请输入终端用户手机!' }],
-              })(
-                <InputNumber style={{width:"200px"}}  />
-              )}   
         </FormItem>
          
         <div style={{border: "1px #f50 dashed",padding: "5px",margin: "0 30px 20px"}}>
-                    <p><span style={{color: "#f50"}}>提示 ：</span>请务必将信息正确填写完整，当前填写信息将作为以后找回授权码、解除绑定等重要操作的依据。</p>
+                    <p><span style={{color: "#f50"}}>提示 ：</span>直销客户不需要选择代理商，直接选择客户公司名称即可。</p>
         </div>
 
         <FormItem {...tailFormItemLayout}>
@@ -539,7 +543,7 @@ class ModCdkModal extends React.Component{
                  </FormItem>
                </Form>
                <div style={{border: "1px #f50 dashed",padding: "5px",margin: "0 30px 20px"}}>
-                  <p><span>提示 ：</span>临时授权站点数最少1个最多可授权500个站点，销售每个授权最多只能延期90天(累计)，如有特殊情况请财务同事延期。</p>
+                  <p><span>提示 ：</span>临时授权站点数最少1个最多可授权500个站点，销售，技术每个授权最多只能延期90天(累计)，如有特殊情况请财务同事延期。</p>
               </div>
             </Modal>
     );

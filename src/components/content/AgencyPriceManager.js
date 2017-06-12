@@ -106,7 +106,6 @@ class AgencyPriceManager extends React.Component {
         let tempArray = data.entity.list;
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
-            if(tempArray[i].state === 4) continue;
             sourceData.push({ 
                 "serial":i+1,
                 "id":tempArray[i].partner && tempArray[i].partner.id,

@@ -28,7 +28,7 @@ export function fetch(url,onComplete,params = {},method='POST'){
     })
     .then((data) => {
         if(data.status === 200){
-            // console.log("成功获取到数据 ",JSON.stringify(data,null,4));
+            console.log("成功获取到数据 ",JSON.stringify(data,null,4));
             onComplete(data);
         }else{
             onComplete(null);          
@@ -59,7 +59,7 @@ export function fetch2(url,onComplete,params = {},method='POST'){
     })
      .then((data) => {
         if(data.status === 200){
-            // console.log("成功获取到数据 ",JSON.stringify(data,null,4));
+            console.log("成功获取到数据 ",JSON.stringify(data,null,4));
             onComplete(data);
         }else{
             onComplete(null);          
