@@ -231,12 +231,13 @@ class PendingOrdersFinance extends React.Component{
         pager.current = pagination.current;
         pager.pageSize = pagination.pageSize;
        // pager.total = pagination.total;
+       let s = filters.stateName && filters.stateName.length!==0?filters.stateName[0]:null;
         this.setState({
             pagination: pager,
             loading:true,
         });
         // 真实api加 参数查询分页 {pageNO:pager.current,size:pager.pageSize,ifGetCount:1}
-        fetch(orderGetPager,this.callbackDate,{pageNO:pager.current,pageSize:pager.pageSize,state:+filters.stateName[0],ifGetCount:1});
+        fetch(orderGetPager,this.callbackDate,{pageNO:pager.current,pageSize:pager.pageSize,state:s,ifGetCount:1});
     }
 
     stateName=(state)=>{

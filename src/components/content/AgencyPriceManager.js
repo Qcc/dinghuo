@@ -37,10 +37,15 @@ class AgencyPriceManager extends React.Component {
         const pager = { ...this.state.pagination };
         pager.current = pagination.current;
         pager.total =pagination.total;
+        pager.pageSize =pagination.pageSize;
         this.setState({
             pagination: pager,
         });
-        fetch(priceGetPager,this.priceUpdate,{pageNO:pager.current,pageSize:pager.size,ifGetCount:1});
+        let s = filters.state && filters.state.length!==0?filters.state[0]:null;
+        fetch(priceGetPager,this.priceUpdate,{pageNO:pager.current,
+                state:s,
+                pageSize:pager.pageSize,
+                ifGetCount:1});
     }
 
     //编辑表格行
@@ -105,6 +110,7 @@ class AgencyPriceManager extends React.Component {
             pager.total=data.entity.count;
         let tempArray = data.entity.list;
         let sourceData=[];
+        if(tempArray!=null)
         for(let i=0;i<tempArray.length;i++){
             sourceData.push({ 
                 "serial":i+1,
@@ -193,6 +199,17 @@ class AgencyPriceManager extends React.Component {
         }, {
           title: '价格状态',
           dataIndex: 'state',
+            filters: [{
+                  text: '待审核',
+                  value: 0,
+                },{
+                  text: '审核通过',
+                  value: 1,
+                },{
+                  text: '审核不通过',
+                  value: -1,
+                }],
+                filterMultiple: false,
         },{
           title: '操作',
           dataIndex: 'edit',

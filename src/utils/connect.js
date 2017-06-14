@@ -72,6 +72,7 @@ export function fetch2(url,onComplete,params = {},method='POST'){
     });
 };
 
+export const indexURL =  ROOTURL + "/kouton/index.html";
 
 //退出
 export const logoutApi = ROOTURL + "/public/user/logout.api";
@@ -79,6 +80,12 @@ export const logoutApi = ROOTURL + "/public/user/logout.api";
 export const isLoggedIn = ROOTURL + "/public/user/isLoggedIn.api";
 //登录
 export const loginApi =ROOTURL +'/public/user/koutonlogin.api';
+
+//修改密码
+export const modifyPassword = ROOTURL+'/public/user/modifyPassword.api';
+//验证码 api 
+export const validateCodeImgURL = ROOTURL + "/public/user/validateCodeImg.api";
+
 //动态菜单
 export const dynamicMenuApi = ROOTURL + '/protected/dynamicmenu/get.api';
 //订单管理 曾 删 改 查

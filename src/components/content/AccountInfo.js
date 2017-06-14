@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button,Icon,Form,Modal,Input,Row,Col } from 'antd';
-import {fetch} from '../../utils/connect';
+import {fetch,modifyPassword,validateCodeImgURL} from '../../utils/connect';
 import '../../styles/accountinfo.css';
 const FormItem = Form.Item;
 
@@ -71,6 +71,9 @@ class PwdModal extends React.Component{
     return;    
     };
     if(data.errorCode !== 0){
+        this.setState({
+            validateMode:this.state.validateMode+1,
+        });
         Modal.error({title: '错误！',content:'服务器错误,'+data.message});
         return;
     }

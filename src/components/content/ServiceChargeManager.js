@@ -55,26 +55,6 @@ class ServiceChargeManager extends React.Component {
         let tempArray = data.entity.list;
         let sourceData=[];
         for(let i=0;i<tempArray.length;i++){
-          if(tempArray[i].ifCanClaim === 1){
-            sourceData.unshift({ 
-                "serial":i+1,
-                "license":tempArray[i].key,
-                "userNumber":tempArray[i].userNumber,
-                "product":tempArray[i].product && tempArray[i].product.productName,
-                "company":tempArray[i].customer && tempArray[i].customer.company,
-                "name":tempArray[i].customer && tempArray[i].customer.name,
-                "phone":tempArray[i].customer && tempArray[i].customer.phone,   
-                "email":tempArray[i].customer && tempArray[i].customer.email, 
-                "customerID":tempArray[i].customer && tempArray[i].customer.id,                                               
-                "ifCanClaimName":tempArray[i].ifCanClaim===1?"可收取":"",
-                "ifCanClaim":tempArray[i].ifCanClaim,                
-                "money":tempArray[i].money,                
-                "datetime":tempArray[i].datetime,
-                "serviceExpirationDate":tempArray[i].serviceExpirationDate,                
-                "salesuser": tempArray[i].customer && tempArray[i].salesUser && tempArray[i].salesUser.employee &&
-                        tempArray[i].salesUser.employee.name,
-            });
-          }else{
             sourceData.push({ 
                 "serial":i+1,
                 "license":tempArray[i].key,
@@ -93,7 +73,6 @@ class ServiceChargeManager extends React.Component {
                 "salesuser": tempArray[i].customer && tempArray[i].salesUser && tempArray[i].salesUser.employee &&
                         tempArray[i].salesUser.employee.name,
             });
-          }
         }
         this.setState({
             loading:false,

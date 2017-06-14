@@ -96,9 +96,13 @@ class AskTemlLic extends React.Component{
         this.setState({
           loading:true,
         });
-        values.productId= +values.productId;
         values.partnerId= values.partnerId?+values.partnerId:null;
-        fetch(generateTrail,this.getLicUpdata,values);
+        fetch(generateTrail,this.getLicUpdata,{
+                  productId:+values.productId,
+                  userNumber:values.userNumber,
+                  trailDay:values.trailDay,
+                  partnerId:values.partnerId,
+                  customerId:+values.customer});
         this.props.formCancel();
       }
     });
@@ -275,7 +279,7 @@ class AskTemlLic extends React.Component{
           {...formItemLayout}
           label="用户"
         >
-          {getFieldDecorator('endUserCompany', {
+          {getFieldDecorator('customer', {
             rules: [{required: true, message: '请输入终端用户公司名称!' }],
           })(
             <Select
@@ -586,7 +590,7 @@ class FilterTable extends React.Component {
     });
     let params = {"type":0,
                   "pageNO":pagination.current,
-                  "size":pagination.pageSize,
+                  "pageSize":pagination.pageSize,
                   //"activation":,  //激活状态，产品暂不实现网络查询，server端未实现and查询功能
                   //'product.productId':
                 };
@@ -618,7 +622,7 @@ class FilterTable extends React.Component {
                       'userNumber':entity[i].userNumber,
                       'productName':entity[i].product.productName,
                       'activation':entity[i].activation?'已激活':'未激活',
-                      'endUserCompany':entity[i].endUserCompany,
+                      'endUserCompany':entity[i].customer && entity[i].customer.company,
                 });
     }
     this.setState({

@@ -209,6 +209,7 @@ class PendingOrdersSales extends React.Component{
         const pager = { ...this.state.pagination };
         pager.current = pagination.current;
         pager.pageSize = pagination.pageSize;
+        let s = filters.stateName && filters.stateName.length!==0?filters.stateName[0]:null;
        // pager.total = pagination.total;
         this.setState({
             pagination: pager,
@@ -216,7 +217,7 @@ class PendingOrdersSales extends React.Component{
         });
        
         // 真实api加 参数查询分页 
-        fetch(orderGetPager,this.callbackDate,{pageNO:pager.current,pageSize:pager.pageSize,state:+filters.stateName[0],ifGetCount:1});
+        fetch(orderGetPager,this.callbackDate,{pageNO:pager.current,pageSize:pager.pageSize,state:s,ifGetCount:1});
     }
 
     stateName=(state)=>{

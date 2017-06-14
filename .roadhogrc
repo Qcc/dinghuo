@@ -1,5 +1,5 @@
 {
-  "entry": "src/main.js",
+  "entry": "src/index.js",
   "extraBabelPlugins": [
     "transform-runtime",
     ["import", { "libraryName": "antd", "style": true }]

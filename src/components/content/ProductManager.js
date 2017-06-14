@@ -476,7 +476,7 @@ class ProductManager extends React.Component {
           title: '市场价(￥)',
           dataIndex: 'productPrice',
         }, {
-          title: '服务费',
+          title: '服务费(%)',
           dataIndex: 'servicechargerate',
         }, {
           title: '质保期(天)',
@@ -487,12 +487,13 @@ class ProductManager extends React.Component {
           render: (text, record, index) => {
                   return (
                     <div>
-                        <a onClick={()=>this.editRow(record)}>编辑</a>{" | "} 
+                        <a onClick={()=>this.editRow(record)}>编辑</a>
+                        {/*{" | "} 
                         <Popconfirm placement="left" title="您确认要删除该产品吗？" 
                           onConfirm={()=>this.deleteProduct(record)} 
                           okText="确认" cancelText="取消">
                         <a >删除</a>                      
-                        </Popconfirm>
+                        </Popconfirm>*/}
                     </div>
                   );
               }, 

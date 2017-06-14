@@ -7,7 +7,7 @@ import DynamicMenu from './components/DynamicMenu.js';
 import DynamicContent from './components/DynamicContent.js';
 import DynamicBreadcrumb from './components/DynamicBreadcrumb.js';
 import KtFooter from './components/Footer.js';
-import {fetch,isLoggedIn,logoutApi} from './utils/connect';
+import {fetch,isLoggedIn,logoutApi,indexURL} from './utils/connect';
 import styles from "./styles/main.css";
 
 
@@ -24,10 +24,6 @@ const CommonProps = {
 };
 
  
-
-//let indexURL = "http://192.168.200.104:8000/dinghuo/kouton/index.html";
-let indexURL = "http://localhost:8000/index.html";
-
 
 
 //确认是否退出
