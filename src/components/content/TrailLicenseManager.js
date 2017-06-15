@@ -112,7 +112,7 @@ class AskTemlLic extends React.Component{
   resetFields=()=>{
     this.props.form.resetFields();
   }
-  formCancel=()=>{
+  handleCancel=()=>{
     this.props.handleCancel();
     this.resetFields();
   }
@@ -299,7 +299,7 @@ class AskTemlLic extends React.Component{
         </div>
 
         <FormItem {...tailFormItemLayout}>
-          <Button onClick={this.formCancel} size="large">取消</Button>
+          <Button onClick={this.handleCancel} size="large">取消</Button>
           <Button style={{margin: "0 30px"}} type="dashed" onClick={this.resetFields} htmlType="submit" size="large">重置</Button>                    
           <Button type="primary" loading={this.state.loading} htmlType="submit" size="large">确认申请</Button>
         </FormItem>
@@ -859,7 +859,7 @@ class TrailLicenseManager extends React.Component{
                   onCancel={this.handleCancel}
                   footer={null}>
 
-                      <WrappedAskTemlLic formCancel={this.handleCancel}/>
+                      <WrappedAskTemlLic handleCancel={this.handleCancel}/>
                 
                 </Modal>
             </div>

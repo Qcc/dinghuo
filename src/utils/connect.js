@@ -1,7 +1,9 @@
 import reqwest from 'reqwest';
 
 //根地址 
-const ROOTURL = "http://192.168.200.104:8080/dinghuo";
+const ROOTURL = "http://121.41.36.165:8080/dinghuo";
+// const ROOTURL = "http://192.168.200.104:8080/dinghuo";
+
 /*
 ajax请求函数
 @url 请求url
@@ -11,7 +13,7 @@ ajax请求函数
 */
 //获取
 export function fetch(url,onComplete,params = {},method='POST'){
-    console.log("调用了fecth =",'url',url,'method',method,'params:', params);
+    // console.log("调用了fecth =",'url',url,'method',method,'params:', params);
     if(typeof onComplete !== 'function'){
         // console.log("成功获取到数据,回调函数不正确",onComplete);
         return;
@@ -28,7 +30,7 @@ export function fetch(url,onComplete,params = {},method='POST'){
     })
     .then((data) => {
         if(data.status === 200){
-            console.log("成功获取到数据 ",JSON.stringify(data,null,4));
+            // console.log("成功获取到数据 ",JSON.stringify(data,null,4));
             onComplete(data);
         }else{
             onComplete(null);          
@@ -43,7 +45,7 @@ export function fetch(url,onComplete,params = {},method='POST'){
 
 //特殊操作
 export function fetch2(url,onComplete,params = {},method='POST'){
-     console.log("调用了fecth =",'url',url,'method',method,'params:', params);
+    //  console.log("调用了fecth =",'url',url,'method',method,'params:', params);
     if(typeof onComplete !== 'function'){
         // console.log("成功获取到数据,回调函数不正确",onComplete);
         return;
@@ -59,7 +61,7 @@ export function fetch2(url,onComplete,params = {},method='POST'){
     })
      .then((data) => {
         if(data.status === 200){
-            console.log("成功获取到数据 ",JSON.stringify(data,null,4));
+            // console.log("成功获取到数据 ",JSON.stringify(data,null,4));
             onComplete(data);
         }else{
             onComplete(null);          
@@ -73,13 +75,15 @@ export function fetch2(url,onComplete,params = {},method='POST'){
 };
 
 export const indexURL =  ROOTURL + "/kouton/index.html";
-
+//登录成功
+export const loginSuccessURL= ROOTURL + "/protected/kouton/main.html";
+// export const loginSuccessURL= "http://localhost:8000/main.html";
 //退出
 export const logoutApi = ROOTURL + "/public/user/logout.api";
 //是否登录
 export const isLoggedIn = ROOTURL + "/public/user/isLoggedIn.api";
 //登录
-export const loginApi =ROOTURL +'/public/user/koutonlogin.api';
+export const actionURL =ROOTURL +'/public/user/koutonlogin.api';
 
 //修改密码
 export const modifyPassword = ROOTURL+'/public/user/modifyPassword.api';

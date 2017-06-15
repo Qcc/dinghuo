@@ -120,7 +120,8 @@ class AgencyPriceManager extends React.Component {
                 "productVersion":tempArray[i].product && tempArray[i].product.productVersion,
                 "productId":tempArray[i].product && tempArray[i].product.productId,                
                 "value":tempArray[i].value,               
-                "balance":tempArray[i].partner && tempArray[i].partner.balance,                
+                "balance":tempArray[i].partner && tempArray[i].partner.balance,    
+                "points":tempArray[i].stock && tempArray[i].stock.points,            
                 "state":state(tempArray[i].state),
             });
         }
@@ -194,6 +195,9 @@ class AgencyPriceManager extends React.Component {
           title: '订货价格',
           dataIndex: 'value',
         }, {
+          title: '库存',
+          dataIndex: 'points',
+        },{
           title: '压款余额',
           dataIndex: 'balance',
         }, {

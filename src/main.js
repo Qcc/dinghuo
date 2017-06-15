@@ -49,6 +49,25 @@ class IsLoggedIn extends React.Component{
     timer =()=> setInterval(()=>{fetch(isLoggedIn,this.isLoggedInUpdate);},600000);
     componentDidMount=()=>{
        this.timer();
+        fetch(isLoggedIn,this.isLoggedIn);           
+    }
+
+    isLoggedIn=(data)=>{
+        if(!data){
+            return;
+        }
+        if(data.entity === 1){
+           window.isLoggedIn=true; 
+        }
+       if(data.entity === 0){
+         window.isLoggedIn=false;  
+         Modal.error({
+         title: '错误！',
+         content: "您还未登录，点击按钮返回主页。",
+         onOk() {window.location.pathname ='/index.html'; },
+          });
+                         
+        } 
     }
     
     isLoggedInUpdate=(data)=>{
