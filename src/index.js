@@ -8,8 +8,8 @@ import LoginForm from './components/LoginForm.js';
 const LoginFormProps = {
     loginSuccessURL:loginSuccessURL,
     actionURL:actionURL,
-    validateCodeImgURL: ROOTURL + "public/user/validateCodeImg.api",
-    checkValidateCodeURL: ROOTURL + "public/user/checkValidateCode.api"
+    validateCodeImgURL: ROOTURL + "/public/user/validateCodeImg.api",
+    checkValidateCodeURL: ROOTURL + "/public/user/checkValidateCode.api"
 };
 
 const WrappedLoginForm = Form.create()(LoginForm);
