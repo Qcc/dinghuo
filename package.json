@@ -12,6 +12,7 @@
     "antd": "^2.10.2",
     "babel-runtime": "^6.9.2",
     "dva": "^1.2.1",
+    "pubsub-js": "^1.5.7",
     "react": "^15.4.0",
     "react-dom": "^15.4.0",
     "reqwest": "^2.0.5"

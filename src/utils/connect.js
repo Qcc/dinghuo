@@ -1,7 +1,7 @@
 import reqwest from 'reqwest';
 
 //根地址 
-export const ROOTURL = "http://www.szcloudshare.com/dinghuo";
+export const ROOTURL = "http://my.kouton.com/dinghuo";
 // const ROOTURL = "http://192.168.200.104:8080/dinghuo";
 
 /*
